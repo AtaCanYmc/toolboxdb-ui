@@ -3,36 +3,41 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Package, Tags, FileClock, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
-import { fetchComponents, fetchCategories } from '../lib/api';
-import type { ComponentItem } from '../types';
+import { fetchComponents, fetchCategories, fetchInvoices } from '../lib/api';
+import type { ComponentItem, Invoice } from '../types';
 
 export function Dashboard() {
   const navigate = useNavigate();
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [categoryCount, setCategoryCount] = useState(0);
+  const [unprocessedInvoices, setUnprocessedInvoices] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadDashboardData() {
       try {
-        const [comps, cats] = await Promise.all([
+        const [comps, cats, invs] = await Promise.all([
           fetchComponents(),
-          fetchCategories()
+          fetchCategories(),
+          fetchInvoices()
         ]);
         setComponents(comps);
         setCategoryCount(cats.length || 0);
+        
+        const unprocessedCount = (invs as Invoice[]).filter(inv => 
+          inv.items.some(item => !item.is_processed)
+        ).length;
+        setUnprocessedInvoices(unprocessedCount);
       } catch (err) {
         console.error("Failed to load dashboard metrics", err);
       } finally {
         setLoading(false);
       }
     }
-    loadDashboardData();
+    loadDashboardData().catch(err => console.error("Error in loadDashboardData", err));
   }, []);
 
   const totalComponents = components.length;
-  // This is a dummy count for unprocessed invoices for UI sake
-  const unprocessedInvoices = 3; 
 
   const recentActivity = components.slice(0, 5).map(c => ({
     id: c.id,
@@ -44,7 +49,7 @@ export function Dashboard() {
   const metrics = [
     { title: 'Total Unique Components', value: loading ? '...' : totalComponents.toString(), icon: Package, color: 'text-blue-500' },
     { title: 'Active Categories', value: loading ? '...' : categoryCount.toString(), icon: Tags, color: 'text-purple-500' },
-    { title: 'Unprocessed Invoices', value: unprocessedInvoices.toString(), icon: FileClock, color: 'text-orange-500' },
+    { title: 'Unprocessed Invoices', value: loading ? '...' : unprocessedInvoices.toString(), icon: FileClock, color: 'text-orange-500' },
   ];
 
   return (
