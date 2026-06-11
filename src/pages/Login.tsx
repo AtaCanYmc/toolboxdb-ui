@@ -4,12 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Globe } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useSettings } from '../contexts/SettingsContext';
 
 export function Login() {
   const { t } = useTranslation();
+  const { language, setLanguage } = useSettings();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +34,18 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative">
+      <div className="absolute top-4 right-4">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => setLanguage(language === 'tr' ? 'en' : 'tr')}
+          className="flex items-center gap-2"
+        >
+          <Globe className="h-4 w-4" />
+          {language === 'tr' ? 'EN' : 'TR'}
+        </Button>
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center font-bold">{t('login.title')}</CardTitle>
