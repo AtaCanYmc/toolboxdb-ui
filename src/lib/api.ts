@@ -47,6 +47,35 @@ export async function fetchCategories() {
   return response.json();
 }
 
+export async function createCategory(name: string) {
+  const response = await fetch(`${BASE_URL}/category/`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ name })
+  });
+  if (!response.ok) throw new Error('Failed to create category');
+  return response.json();
+}
+
+export async function updateCategory(id: number, name: string) {
+  const response = await fetch(`${BASE_URL}/category/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify({ name })
+  });
+  if (!response.ok) throw new Error('Failed to update category');
+  return response.json();
+}
+
+export async function deleteCategory(id: number) {
+  const response = await fetch(`${BASE_URL}/category/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to delete category');
+  return true;
+}
+
 export async function fetchComponents() {
   const response = await fetch(`${BASE_URL}/components/?skip=0&limit=100`, {
     headers: getHeaders()

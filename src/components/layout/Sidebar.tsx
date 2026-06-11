@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FileText, Package, Lightbulb, Settings } from 'lucide-react';
+import { LayoutDashboard, FileText, Package, Lightbulb, Settings, Tags } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export function Sidebar() {
@@ -7,6 +7,7 @@ export function Sidebar() {
     { name: 'Dashboard', to: '/', icon: LayoutDashboard },
     { name: 'Invoices', to: '/invoices', icon: FileText },
     { name: 'Inventory', to: '/inventory', icon: Package },
+    { name: 'Categories', to: '/categories', icon: Tags },
     { name: 'AI Ideas', to: '/ai-generator', icon: Lightbulb },
   ];
 
