@@ -130,7 +130,15 @@
     "defaultTime": "Tahmini 2-3 Saat",
     "requiredPieces": "Gerekli Parçalar",
     "steps": "Uygulama Adımları",
-    "empty": "Proje fikirleri oluşturmak için soldaki formu doldurun."
+    "empty": "Proje fikirleri oluşturmak için soldaki formu doldurun.",
+    "extraComponents": "Ek Bileşenler",
+    "extraComponentsPlaceholder": "örn. Arduino, Röle modülü...",
+    "difficultyLevel": "Zorluk Seviyesi",
+    "difficultyBeginner": "Başlangıç",
+    "difficultyIntermediate": "Orta",
+    "difficultyAdvanced": "İleri",
+    "extraMessage": "Ek Mesaj",
+    "extraMessagePlaceholder": "Yapay zekaya ek içerik veya notlar..."
   },
   "inventory": {
     "title": "Envanter ve Bileşen Yönetimi",

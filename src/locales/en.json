@@ -130,7 +130,15 @@
     "defaultTime": "Est. 2-3 Hours",
     "requiredPieces": "Required Pieces",
     "steps": "Implementation Steps",
-    "empty": "Fill out the form on the left to generate project ideas."
+    "empty": "Fill out the form on the left to generate project ideas.",
+    "extraComponents": "Extra Components",
+    "extraComponentsPlaceholder": "e.g. Arduino, Relay module...",
+    "difficultyLevel": "Difficulty Level",
+    "difficultyBeginner": "Beginner",
+    "difficultyIntermediate": "Intermediate",
+    "difficultyAdvanced": "Advanced",
+    "extraMessage": "Extra Message",
+    "extraMessagePlaceholder": "Any extra context or message to AI..."
   },
   "inventory": {
     "title": "Inventory & Component Management",

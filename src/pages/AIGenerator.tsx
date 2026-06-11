@@ -78,32 +78,32 @@ export function AIGenerator() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Extra Components</label>
+                <label className="text-sm font-medium">{t('ai.extraComponents')}</label>
                 <Input 
-                  placeholder="e.g. Arduino, Relay module..."
+                  placeholder={t('ai.extraComponentsPlaceholder')}
                   value={extraComponents}
                   onChange={(e) => setExtraComponents(e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Difficulty Level</label>
+                <label className="text-sm font-medium">{t('ai.difficultyLevel')}</label>
                 <select 
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
                 >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
+                  <option value="Beginner">{t('ai.difficultyBeginner')}</option>
+                  <option value="Intermediate">{t('ai.difficultyIntermediate')}</option>
+                  <option value="Advanced">{t('ai.difficultyAdvanced')}</option>
                 </select>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Extra Message</label>
+                <label className="text-sm font-medium">{t('ai.extraMessage')}</label>
                 <textarea 
                   className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder="Any extra context or message to AI..."
+                  placeholder={t('ai.extraMessagePlaceholder')}
                   value={extraMessage}
                   onChange={(e) => setExtraMessage(e.target.value)}
                 />
