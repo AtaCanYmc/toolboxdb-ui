@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
+import { useTranslation } from 'react-i18next';
 import { fetchComponents } from '../lib/api';
 import type { ComponentItem } from '../types';
 
 export function InventoryList() {
+  const { t, i18n } = useTranslation();
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -25,11 +27,11 @@ export function InventoryList() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Inventory & Component Management</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('inventory.title')}</h1>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Stok Listesi</CardTitle>
+          <CardTitle>{t('inventory.cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -38,16 +40,16 @@ export function InventoryList() {
             </div>
           ) : components.length === 0 ? (
             <div className="flex items-center justify-center h-64 text-muted-foreground border-2 border-dashed border-border rounded-xl">
-              No components found in inventory.
+              {t('inventory.empty')}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Component Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead className="text-right">Created At</TableHead>
+                  <TableHead>{t('inventory.table.name')}</TableHead>
+                  <TableHead>{t('inventory.table.cat')}</TableHead>
+                  <TableHead className="text-right">{t('inventory.table.qty')}</TableHead>
+                  <TableHead className="text-right">{t('inventory.table.createdAt')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -61,7 +63,7 @@ export function InventoryList() {
                       </span>
                     </TableCell>
                     <TableCell className="text-right text-muted-foreground">
-                      {new Date(item.created_at).toLocaleDateString()}
+                      {new Date(item.created_at).toLocaleDateString(i18n.language === 'tr' ? 'tr-TR' : 'en-US')}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -2,15 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { useSettings } from '../contexts/SettingsContext';
 import { Monitor, Moon, Sun, Languages } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { useTranslation } from 'react-i18next';
 
 export function Settings() {
+  const { t } = useTranslation();
   const { theme, setTheme, language, setLanguage } = useSettings();
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">
-          {language === 'tr' ? 'Ayarlar' : 'Settings'}
+          {t('settings.title')}
         </h1>
       </div>
 
@@ -21,12 +23,10 @@ export function Settings() {
             <CardTitle className="flex items-center gap-2">
               <Sun className="h-5 w-5 text-orange-500 dark:hidden" />
               <Moon className="h-5 w-5 text-blue-400 hidden dark:block" />
-              {language === 'tr' ? 'Görünüm ve Tema' : 'Appearance & Theme'}
+              {t('settings.appearance.title')}
             </CardTitle>
             <CardDescription>
-              {language === 'tr' 
-                ? 'Uygulamanın nasıl görüneceğini seçin.' 
-                : 'Choose how the application looks to you.'}
+              {t('settings.appearance.desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -37,7 +37,7 @@ export function Settings() {
                 onClick={() => setTheme('light')}
               >
                 <Sun className="h-6 w-6" />
-                <span>{language === 'tr' ? 'Aydınlık' : 'Light'}</span>
+                <span>{t('settings.appearance.light')}</span>
               </Button>
               <Button 
                 variant={theme === 'dark' ? 'default' : 'outline'}
@@ -45,7 +45,7 @@ export function Settings() {
                 onClick={() => setTheme('dark')}
               >
                 <Moon className="h-6 w-6" />
-                <span>{language === 'tr' ? 'Karanlık' : 'Dark'}</span>
+                <span>{t('settings.appearance.dark')}</span>
               </Button>
               <Button 
                 variant={theme === 'system' ? 'default' : 'outline'}
@@ -53,7 +53,7 @@ export function Settings() {
                 onClick={() => setTheme('system')}
               >
                 <Monitor className="h-6 w-6" />
-                <span>{language === 'tr' ? 'Sistem' : 'System'}</span>
+                <span>{t('settings.appearance.system')}</span>
               </Button>
             </div>
           </CardContent>
@@ -64,12 +64,10 @@ export function Settings() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Languages className="h-5 w-5 text-green-500" />
-              {language === 'tr' ? 'Dil Seçenekleri' : 'Language Options'}
+              {t('settings.language.title')}
             </CardTitle>
             <CardDescription>
-              {language === 'tr' 
-                ? 'Arayüz dilini belirleyin.' 
-                : 'Select the interface language.'}
+              {t('settings.language.desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

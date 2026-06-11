@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import i18n from '../lib/i18n';
 
 type Theme = 'light' | 'dark' | 'system';
 type Language = 'tr' | 'en';
@@ -53,6 +54,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const setLanguage = (newLang: Language) => {
     setLanguageState(newLang);
     localStorage.setItem('language', newLang);
+    i18n.changeLanguage(newLang);
   };
 
   useEffect(() => {

@@ -4,9 +4,11 @@ import { Button } from '../components/ui/Button';
 import { User, Mail, Shield, Calendar, Loader2, LogOut } from 'lucide-react';
 import { fetchProfile } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import type { UserProfile } from '../types';
 
 export function Profile() {
+  const { t, i18n } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { logout } = useAuth();
@@ -36,7 +38,7 @@ export function Profile() {
   if (!profile) {
     return (
       <div className="flex h-[50vh] items-center justify-center text-muted-foreground">
-        Profil bilgileri yüklenemedi.
+        {t('profile.loading_error')}
       </div>
     );
   }
@@ -44,10 +46,10 @@ export function Profile() {
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Kullanıcı Profili</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('profile.title')}</h1>
         <Button variant="destructive" onClick={logout}>
           <LogOut className="mr-2 h-4 w-4" />
-          Çıkış Yap
+          {t('profile.logout')}
         </Button>
       </div>
 
@@ -58,7 +60,7 @@ export function Profile() {
           </div>
           <CardTitle className="text-2xl">{profile.username}</CardTitle>
           <CardDescription className="text-base mt-2">
-            ToolboxDB Sistem Bilgileri
+            {t('profile.system_info')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6 pb-10">
@@ -66,7 +68,7 @@ export function Profile() {
             <div className="flex items-center space-x-4 p-4 rounded-lg bg-card/50 border">
               <Mail className="h-6 w-6 text-blue-500" />
               <div>
-                <p className="text-sm font-medium leading-none">E-posta</p>
+                <p className="text-sm font-medium leading-none">{t('profile.email')}</p>
                 <p className="text-sm text-muted-foreground mt-1">{profile.email}</p>
               </div>
             </div>
@@ -74,7 +76,7 @@ export function Profile() {
             <div className="flex items-center space-x-4 p-4 rounded-lg bg-card/50 border">
               <Shield className="h-6 w-6 text-purple-500" />
               <div>
-                <p className="text-sm font-medium leading-none">Yetki Rolü</p>
+                <p className="text-sm font-medium leading-none">{t('profile.role')}</p>
                 <p className="text-sm text-muted-foreground mt-1 capitalize">{profile.role}</p>
               </div>
             </div>
@@ -82,9 +84,9 @@ export function Profile() {
             <div className="flex items-center space-x-4 p-4 rounded-lg bg-card/50 border md:col-span-2">
               <Calendar className="h-6 w-6 text-green-500" />
               <div>
-                <p className="text-sm font-medium leading-none">Kayıt Tarihi</p>
+                <p className="text-sm font-medium leading-none">{t('profile.joined')}</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {new Date(profile.created_at).toLocaleDateString('tr-TR', {
+                  {new Date(profile.created_at).toLocaleDateString(i18n.language === 'tr' ? 'tr-TR' : 'en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',

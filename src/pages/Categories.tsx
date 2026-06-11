@@ -5,10 +5,12 @@ import {Input} from '../components/ui/Input';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '../components/ui/Table';
 import {Tags, Loader2, Trash2, Edit2, Plus, X, Check} from 'lucide-react';
 import {toast} from 'react-hot-toast';
+import {useTranslation} from 'react-i18next';
 import {fetchCategories, createCategory, updateCategory, deleteCategory} from '../lib/api';
 import type {Category} from '../types';
 
 export function Categories() {
+    const {t} = useTranslation();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [newCategoryName, setNewCategoryName] = useState('');
@@ -44,21 +46,21 @@ export function Categories() {
             await loadData();
         } catch (err) {
             console.error(err);
-            toast.error('Kategori oluşturulurken bir hata oluştu veya yetkiniz yok.');
+            toast.error(t('categories.errors.create'));
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Bu kategoriyi silmek istediğinize emin misiniz?")) return;
+        if (!confirm(t('categories.confirmDelete'))) return;
 
         try {
             await deleteCategory(id);
             await loadData();
         } catch (err) {
             console.error(err);
-            toast.error('Kategori silinirken bir hata oluştu veya yetkiniz yok.');
+            toast.error(t('categories.errors.delete'));
         }
     };
 
@@ -81,14 +83,14 @@ export function Categories() {
             await loadData();
         } catch (err) {
             console.error(err);
-            toast.error('Kategori güncellenirken bir hata oluştu veya yetkiniz yok.');
+            toast.error(t('categories.errors.update'));
         }
     };
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Kategori Yönetimi</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t('categories.title')}</h1>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -99,15 +101,15 @@ export function Categories() {
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
                                 <Tags className="h-5 w-5 text-purple-500"/>
-                                Yeni Kategori Ekle
+                                {t('categories.new')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleCreate} className="space-y-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Kategori Adı</label>
+                                    <label className="text-sm font-medium">{t('categories.name')}</label>
                                     <Input
-                                        placeholder="Örn: Sensörler"
+                                        placeholder={t('categories.placeholder')}
                                         value={newCategoryName}
                                         onChange={(e) => setNewCategoryName(e.target.value)}
                                         disabled={isSubmitting}
@@ -120,7 +122,7 @@ export function Categories() {
                                 >
                                     {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> :
                                         <Plus className="mr-2 h-4 w-4"/>}
-                                    Ekle
+                                    {t('common.add')}
                                 </Button>
                             </form>
                         </CardContent>
@@ -131,7 +133,7 @@ export function Categories() {
                 <div className="col-span-1 md:col-span-2">
                     <Card className="h-full">
                         <CardHeader>
-                            <CardTitle className="text-lg">Mevcut Kategoriler</CardTitle>
+                            <CardTitle className="text-lg">{t('categories.existing')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             {loading ? (
@@ -140,16 +142,16 @@ export function Categories() {
                                 </div>
                             ) : categories.length === 0 ? (
                                 <div className="text-center p-8 text-muted-foreground">
-                                    Hiç kategori bulunamadı.
+                                    {t('categories.empty')}
                                 </div>
                             ) : (
                                 <div className="border rounded-md overflow-hidden">
                                     <Table>
                                         <TableHeader className="bg-muted/50">
                                             <TableRow>
-                                                <TableHead>Kategori Adı</TableHead>
-                                                <TableHead>Oluşturulma Tarihi</TableHead>
-                                                <TableHead className="text-right w-24">İşlemler</TableHead>
+                                                <TableHead>{t('categories.name')}</TableHead>
+                                                <TableHead>{t('categories.created_at')}</TableHead>
+                                                <TableHead className="text-right w-24">{t('categories.actions')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>

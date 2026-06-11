@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Package, Tags, FileClock, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { fetchComponents, fetchCategories, fetchInvoices } from '../lib/api';
 import type { ComponentItem, Invoice } from '../types';
 
 export function Dashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [components, setComponents] = useState<ComponentItem[]>([]);
   const [categoryCount, setCategoryCount] = useState(0);
@@ -43,25 +45,25 @@ export function Dashboard() {
     id: c.id,
     name: c.name,
     qty: c.quantity,
-    status: c.quantity < 5 ? 'Low Stock' : 'In Stock'
+    status: c.quantity < 5 ? t('dashboard.activity.low_stock') : t('dashboard.activity.in_stock')
   }));
 
   const metrics = [
-    { title: 'Total Unique Components', value: loading ? '...' : totalComponents.toString(), icon: Package, color: 'text-blue-500' },
-    { title: 'Active Categories', value: loading ? '...' : categoryCount.toString(), icon: Tags, color: 'text-purple-500' },
-    { title: 'Unprocessed Invoices', value: loading ? '...' : unprocessedInvoices.toString(), icon: FileClock, color: 'text-orange-500' },
+    { title: t('dashboard.metrics.total_comps'), value: loading ? '...' : totalComponents.toString(), icon: Package, color: 'text-blue-500' },
+    { title: t('dashboard.metrics.active_cats'), value: loading ? '...' : categoryCount.toString(), icon: Tags, color: 'text-purple-500' },
+    { title: t('dashboard.metrics.unprocessed'), value: loading ? '...' : unprocessedInvoices.toString(), icon: FileClock, color: 'text-orange-500' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('dashboard.title')}</h1>
         <Button 
           onClick={() => navigate('/ai-generator')}
           className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
         >
           <Sparkles className="mr-2 h-4 w-4" />
-          Quick AI Project
+          {t('dashboard.quick_ai')}
         </Button>
       </div>
 
@@ -83,13 +85,13 @@ export function Dashboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Recent Activity & Low Stock Warnings</CardTitle>
+          <CardTitle>{t('dashboard.activity.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-             <div className="animate-pulse text-sm text-muted-foreground">Loading...</div>
+             <div className="animate-pulse text-sm text-muted-foreground">{t('common.loading')}</div>
           ) : recentActivity.length === 0 ? (
-             <div className="text-sm text-muted-foreground">No recent activity</div>
+             <div className="text-sm text-muted-foreground">{t('dashboard.activity.no_activity')}</div>
           ) : (
             <div className="space-y-4">
               {recentActivity.map((item) => (
@@ -100,7 +102,7 @@ export function Dashboard() {
                     </div>
                     <div>
                       <p className="font-medium leading-none">{item.name}</p>
-                      <p className="text-sm text-muted-foreground mt-1">Quantity: {item.qty}</p>
+                      <p className="text-sm text-muted-foreground mt-1">{t('dashboard.activity.quantity')}{item.qty}</p>
                     </div>
                   </div>
                   <div className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.qty < 5 ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>

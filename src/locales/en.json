@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "success": "Success"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "invoices": "Invoices",
+    "inventory": "Inventory",
+    "categories": "Categories",
+    "ai_ideas": "AI Ideas",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "dashboard": {
+    "title": "Dashboard Overview",
+    "quick_ai": "Quick AI Project",
+    "metrics": {
+      "total_comps": "Total Unique Components",
+      "active_cats": "Active Categories",
+      "unprocessed": "Unprocessed Invoices"
+    },
+    "activity": {
+      "title": "Recent Activity & Low Stock Warnings",
+      "no_activity": "No recent activity",
+      "quantity": "Quantity: ",
+      "low_stock": "Low Stock",
+      "in_stock": "In Stock"
+    }
+  },
+  "profile": {
+    "title": "User Profile",
+    "logout": "Logout",
+    "system_info": "ToolboxDB System Information",
+    "email": "Email",
+    "role": "Role",
+    "joined": "Joined Date",
+    "loading_error": "Failed to load profile information."
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": {
+      "title": "Appearance & Theme",
+      "desc": "Choose how the application looks to you.",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    },
+    "language": {
+      "title": "Language Options",
+      "desc": "Select the interface language."
+    }
+  },
+  "login": {
+    "title": "Sign in",
+    "desc": "Enter your username and password to access ToolboxDB",
+    "username": "Username",
+    "password": "Password",
+    "button": "Sign in",
+    "success": "Login successful!",
+    "error": "Invalid credentials"
+  },
+  "categories": {
+    "title": "Category Management",
+    "new": "New Category",
+    "name": "Category Name",
+    "desc": "Description",
+    "actions": "Actions",
+    "empty": "No categories found.",
+    "errors": {
+      "create": "Error creating category or unauthorized.",
+      "delete": "Error deleting category or unauthorized.",
+      "update": "Error updating category or unauthorized."
+    },
+    "edit_title": "Edit Category",
+    "edit_desc": "Update the category name.",
+    "confirmDelete": "Are you sure you want to delete this category?",
+    "existing": "Existing Categories",
+    "placeholder": "Ex: Sensors",
+    "created_at": "Created At"
+  },
+  "invoices": {
+    "title": "Invoice Processing & Staging",
+    "confirmDelete": "Are you sure you want to delete this invoice?",
+    "deleteFail": "Failed to delete.",
+    "pdfError": "Please upload a PDF file.",
+    "uploadError": "Error uploading invoice.",
+    "approveSuccess": "Invoice approved and added to stock!",
+    "approveFail": "Error approving invoice.",
+    "confirmItemDelete": "Are you sure you want to remove this item?",
+    "approveButton": "Approve Invoice",
+    "itemsToProcess": "Items to Process",
+    "newInvoice": "Upload New Invoice",
+    "history": "Past Invoices",
+    "emptyHistory": "No invoices found.",
+    "uploading": "AI is reading the invoice...",
+    "uploadTitle": "Upload PDF Invoice",
+    "uploadDescUploading": "This may take a few seconds depending on the invoice size.",
+    "uploadDesc": "Drag your supplier invoice here or click to select. Our AI will extract items automatically.",
+    "selectFile": "Select File",
+    "invoiceOf": "Invoice",
+    "uploadedAt": "Uploaded:",
+    "totalAmount": "Total Amount:",
+    "emptyInvoice": "No items found to process in this invoice.",
+    "table": {
+      "raw": "Raw Name",
+      "clean": "Clean Name",
+      "qty": "Qty",
+      "cat": "Category",
+      "catPlaceholder": "Enter Category"
+    }
+  },
+  "ai": {
+    "title": "AI Project Suggestion Hub",
+    "generateFail": "Failed to generate project ideas",
+    "cardTitle": "Creative Project Generation Center",
+    "focusArea": "Focus Area (Theme)",
+    "focusPlaceholder": "e.g. IoT, Smart Home, Robotics",
+    "generating": "Generating Ideas...",
+    "generateBtn": "Generate Project Idea",
+    "defaultTitle": "Great Project Idea",
+    "defaultDiff": "Medium",
+    "defaultTime": "Est. 2-3 Hours",
+    "requiredPieces": "Required Pieces",
+    "steps": "Implementation Steps",
+    "empty": "Fill out the form on the left to generate project ideas."
+  },
+  "inventory": {
+    "title": "Inventory & Component Management",
+    "cardTitle": "Stock List",
+    "empty": "No components found in inventory.",
+    "table": {
+      "name": "Component Name",
+      "cat": "Category",
+      "qty": "Quantity",
+      "createdAt": "Created At"
+    }
+  }
+}

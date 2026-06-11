@@ -1,0 +1,146 @@
+{
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "add": "Ekle",
+    "close": "Kapat",
+    "success": "Başarılı"
+  },
+  "nav": {
+    "dashboard": "Ana Panel",
+    "invoices": "Faturalar",
+    "inventory": "Envanter",
+    "categories": "Kategoriler",
+    "ai_ideas": "Yapay Zeka",
+    "settings": "Ayarlar",
+    "profile": "Profil"
+  },
+  "dashboard": {
+    "title": "Ana Panel Görünümü",
+    "quick_ai": "Hızlı AI Projesi",
+    "metrics": {
+      "total_comps": "Toplam Benzersiz Bileşen",
+      "active_cats": "Aktif Kategoriler",
+      "unprocessed": "İşlenmemiş Faturalar"
+    },
+    "activity": {
+      "title": "Son Hareketler & Düşük Stok Uyarıları",
+      "no_activity": "Son hareket bulunmuyor",
+      "quantity": "Miktar: ",
+      "low_stock": "Düşük Stok",
+      "in_stock": "Stokta"
+    }
+  },
+  "profile": {
+    "title": "Kullanıcı Profili",
+    "logout": "Çıkış Yap",
+    "system_info": "ToolboxDB Sistem Bilgileri",
+    "email": "E-posta",
+    "role": "Yetki Rolü",
+    "joined": "Kayıt Tarihi",
+    "loading_error": "Profil bilgileri yüklenemedi."
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "appearance": {
+      "title": "Görünüm ve Tema",
+      "desc": "Uygulamanın nasıl görüneceğini seçin.",
+      "light": "Aydınlık",
+      "dark": "Karanlık",
+      "system": "Sistem"
+    },
+    "language": {
+      "title": "Dil Seçenekleri",
+      "desc": "Arayüz dilini belirleyin."
+    }
+  },
+  "login": {
+    "title": "Giriş Yap",
+    "desc": "ToolboxDB'ye erişmek için kullanıcı adı ve şifrenizi girin",
+    "username": "Kullanıcı Adı",
+    "password": "Şifre",
+    "button": "Giriş Yap",
+    "success": "Giriş başarılı!",
+    "error": "Geçersiz kimlik bilgileri"
+  },
+  "categories": {
+    "title": "Kategori Yönetimi",
+    "new": "Yeni Kategori",
+    "name": "Kategori Adı",
+    "desc": "Açıklama",
+    "actions": "İşlemler",
+    "empty": "Kategori bulunamadı.",
+    "errors": {
+      "create": "Kategori oluşturulurken bir hata oluştu veya yetkiniz yok.",
+      "delete": "Kategori silinirken bir hata oluştu veya yetkiniz yok.",
+      "update": "Kategori güncellenirken bir hata oluştu veya yetkiniz yok."
+    },
+    "edit_title": "Kategori Düzenle",
+    "edit_desc": "Kategori adını güncelleyin.",
+    "confirmDelete": "Bu kategoriyi silmek istediğinize emin misiniz?",
+    "existing": "Mevcut Kategoriler",
+    "placeholder": "Örn: Sensörler",
+    "created_at": "Oluşturulma Tarihi"
+  },
+  "invoices": {
+    "title": "Fatura İşleme Merkezi",
+    "confirmDelete": "Bu faturayı silmek istediğinize emin misiniz?",
+    "deleteFail": "Silme başarısız.",
+    "pdfError": "Lütfen bir PDF dosyası yükleyin.",
+    "uploadError": "Fatura yüklenirken hata oluştu.",
+    "approveSuccess": "Fatura başarıyla onaylandı ve stoğa işlendi!",
+    "approveFail": "Fatura onaylanırken bir hata oluştu.",
+    "confirmItemDelete": "Bu öğeyi listeden çıkarmak istediğinize emin misiniz?",
+    "approveButton": "Faturayı Onayla",
+    "itemsToProcess": "Öğeyi İşle",
+    "newInvoice": "Yeni Fatura Yükle",
+    "history": "Geçmiş Faturalar",
+    "emptyHistory": "Fatura bulunamadı.",
+    "uploading": "Yapay Zeka Faturayı Okuyor...",
+    "uploadTitle": "PDF Fatura Yükle",
+    "uploadDescUploading": "Bu işlem fatura boyutuna göre birkaç saniye sürebilir.",
+    "uploadDesc": "Tedarikçi faturanızı buraya sürükleyin veya seçmek için tıklayın. AI sistemimiz parçaları otomatik ayıklayacaktır.",
+    "selectFile": "Dosya Seç",
+    "invoiceOf": "Faturası",
+    "uploadedAt": "Yüklenme:",
+    "totalAmount": "Toplam Tutar:",
+    "emptyInvoice": "Bu faturada işlenecek parça bulunamadı.",
+    "table": {
+      "raw": "Ham İsim",
+      "clean": "Temiz İsim",
+      "qty": "Adet",
+      "cat": "Kategori",
+      "catPlaceholder": "Kategori Girin"
+    }
+  },
+  "ai": {
+    "title": "Yapay Zeka Proje Öneri Merkezi",
+    "generateFail": "Proje fikirleri oluşturulamadı.",
+    "cardTitle": "Yaratıcı Proje Üretim Merkezi",
+    "focusArea": "Odak Alanı (Tema)",
+    "focusPlaceholder": "Örn: IoT, Akıllı Ev, Robotik",
+    "generating": "Fikir Üretiliyor...",
+    "generateBtn": "Proje Fikri Üret",
+    "defaultTitle": "Harika Bir Proje Fikri",
+    "defaultDiff": "Orta",
+    "defaultTime": "Tahmini 2-3 Saat",
+    "requiredPieces": "Gerekli Parçalar",
+    "steps": "Uygulama Adımları",
+    "empty": "Proje fikirleri oluşturmak için soldaki formu doldurun."
+  },
+  "inventory": {
+    "title": "Envanter ve Bileşen Yönetimi",
+    "cardTitle": "Stok Listesi",
+    "empty": "Envanterde hiç bileşen bulunamadı.",
+    "table": {
+      "name": "Bileşen Adı",
+      "cat": "Kategori",
+      "qty": "Adet",
+      "createdAt": "Oluşturulma Tarihi"
+    }
+  }
+}

@@ -4,10 +4,12 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Sparkles, Loader2, CheckCircle2, Circle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { generateProjectIdeas } from '../lib/api';
 import type { AIProjectSuggestion } from '../types';
 
 export function AIGenerator() {
+  const { t } = useTranslation();
   const [focusArea, setFocusArea] = useState('');
   
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export function AIGenerator() {
       setSuggestion(data);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to generate project ideas');
+      toast.error(t('ai.generateFail'));
     } finally {
       setLoading(false);
     }
@@ -33,7 +35,7 @@ export function AIGenerator() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">AI Project Suggestion Hub</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t('ai.title')}</h1>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -41,13 +43,13 @@ export function AIGenerator() {
         <div className="col-span-1 lg:col-span-4">
           <Card>
             <CardHeader>
-              <CardTitle>Yaratıcı Proje Üretim Merkezi</CardTitle>
+              <CardTitle>{t('ai.cardTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Focus Area (Theme)</label>
+                <label className="text-sm font-medium">{t('ai.focusArea')}</label>
                 <Input 
-                  placeholder="e.g. IoT, Smart Home, Robotics" 
+                  placeholder={t('ai.focusPlaceholder')}
                   value={focusArea}
                   onChange={(e) => setFocusArea(e.target.value)}
                 />
@@ -59,7 +61,7 @@ export function AIGenerator() {
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                {loading ? 'Fikir Üretiliyor...' : 'Proje Fikri Üret'}
+                {loading ? t('ai.generating') : t('ai.generateBtn')}
               </Button>
             </CardContent>
           </Card>
@@ -72,22 +74,22 @@ export function AIGenerator() {
                <CardHeader className="border-b border-border bg-muted/20">
                  <div className="flex items-start justify-between">
                    <div>
-                     <CardTitle className="text-2xl text-primary">{suggestion.title || 'Harika Bir Proje Fikri'}</CardTitle>
+                     <CardTitle className="text-2xl text-primary">{suggestion.title || t('ai.defaultTitle')}</CardTitle>
                      <p className="text-sm text-muted-foreground mt-2">{suggestion.description}</p>
                    </div>
                    <div className="flex flex-col items-end space-y-1">
                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-500">
-                       {suggestion.difficulty || 'Medium'}
+                       {suggestion.difficulty || t('ai.defaultDiff')}
                      </span>
                      <span className="text-xs text-muted-foreground font-mono">
-                       {suggestion.build_time || 'Tahmini 2-3 Saat'}
+                       {suggestion.build_time || t('ai.defaultTime')}
                      </span>
                    </div>
                  </div>
                </CardHeader>
                <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                  <div>
-                   <h3 className="text-lg font-semibold mb-4">Gerekli Parçalar</h3>
+                   <h3 className="text-lg font-semibold mb-4">{t('ai.requiredPieces')}</h3>
                    <ul className="space-y-3">
                      {suggestion.required_pieces?.map((piece, idx) => (
                        <li key={idx} className="flex items-start space-x-3">
@@ -108,7 +110,7 @@ export function AIGenerator() {
                  </div>
                  
                  <div>
-                   <h3 className="text-lg font-semibold mb-4">Uygulama Adımları</h3>
+                   <h3 className="text-lg font-semibold mb-4">{t('ai.steps')}</h3>
                    <ol className="space-y-4">
                      {suggestion.steps?.map((step, idx) => (
                        <li key={idx} className="flex space-x-3">
@@ -125,10 +127,10 @@ export function AIGenerator() {
                </CardContent>
              </Card>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
-              <Sparkles className="h-12 w-12 text-muted-foreground/30 mb-4" />
-              <p>Proje fikirleri oluşturmak için soldaki formu doldurun.</p>
-            </div>
+             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
+               <Sparkles className="h-12 w-12 text-muted-foreground/30 mb-4" />
+               <p>{t('ai.empty')}</p>
+             </div>
           )}
         </div>
       </div>

@@ -6,8 +6,10 @@ import { Input } from '../components/ui/Input';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 export function Login() {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,10 +22,10 @@ export function Login() {
     
     try {
       await login(username, password);
-      toast.success('Giriş başarılı!');
+      toast.success(t('login.success'));
       navigate('/');
     } catch {
-      toast.error('Invalid credentials');
+      toast.error(t('login.error'));
     } finally {
       setLoading(false);
     }
@@ -33,16 +35,16 @@ export function Login() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl text-center font-bold">Sign in</CardTitle>
+          <CardTitle className="text-2xl text-center font-bold">{t('login.title')}</CardTitle>
           <p className="text-center text-muted-foreground text-sm">
-            Enter your username and password to access ToolboxDB
+            {t('login.desc')}
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Username
+                {t('login.username')}
               </label>
               <Input 
                 type="text" 
@@ -54,7 +56,7 @@ export function Login() {
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Password
+                {t('login.password')}
               </label>
               <Input 
                 type="password" 
@@ -72,7 +74,7 @@ export function Login() {
               disabled={loading}
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Sign in
+              {t('login.button')}
             </Button>
           </form>
         </CardContent>

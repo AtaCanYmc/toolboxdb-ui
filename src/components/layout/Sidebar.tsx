@@ -1,14 +1,17 @@
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, FileText, Package, Lightbulb, Settings, Tags } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
+  const { t } = useTranslation();
+  
   const navItems = [
-    { name: 'Dashboard', to: '/', icon: LayoutDashboard },
-    { name: 'Invoices', to: '/invoices', icon: FileText },
-    { name: 'Inventory', to: '/inventory', icon: Package },
-    { name: 'Categories', to: '/categories', icon: Tags },
-    { name: 'AI Ideas', to: '/ai-generator', icon: Lightbulb },
+    { name: t('nav.dashboard'), to: '/', icon: LayoutDashboard },
+    { name: t('nav.invoices'), to: '/invoices', icon: FileText },
+    { name: t('nav.inventory'), to: '/inventory', icon: Package },
+    { name: t('nav.categories'), to: '/categories', icon: Tags },
+    { name: t('nav.ai_ideas'), to: '/ai-generator', icon: Lightbulb },
   ];
 
   return (
@@ -50,7 +53,7 @@ export function Sidebar() {
           }
         >
           <Settings className="h-5 w-5" />
-          <span>Settings</span>
+          <span>{t('nav.settings')}</span>
         </NavLink>
       </div>
     </aside>

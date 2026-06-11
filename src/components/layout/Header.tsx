@@ -3,8 +3,10 @@ import { Moon, Sun, Bell, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useTranslation } from 'react-i18next';
 
 export function Header() {
+  const { t } = useTranslation();
   const { isDark, setTheme } = useSettings();
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -28,7 +30,7 @@ export function Header() {
         <div 
           onClick={() => navigate('/profile')}
           className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium cursor-pointer hover:bg-primary/30 transition-colors"
-          title="Profile"
+          title={t('nav.profile')}
         >
           <User className="h-4 w-4" />
         </div>

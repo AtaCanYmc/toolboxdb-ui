@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 import {Button} from '../components/ui/Button';
 import {Input} from '../components/ui/Input';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '../components/ui/Table';
+import { useTranslation } from 'react-i18next';
 import type {Invoice} from '../types';
 import {
     uploadInvoice,
@@ -17,6 +18,7 @@ import {
 } from '../lib/api';
 
 export function InvoiceProcessing() {
+    const { t } = useTranslation();
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [activeInvoice, setActiveInvoice] = useState<Invoice | null>(null);
 
@@ -52,14 +54,14 @@ export function InvoiceProcessing() {
 
     const handleDeleteInvoice = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!confirm("Bu faturayı silmek istediğinize emin misiniz?")) return;
+        if (!confirm(t('invoices.confirmDelete'))) return;
         try {
             await deleteInvoice(id);
             if (activeInvoice?.id === id) setActiveInvoice(null);
             await loadInvoices();
         } catch (err) {
             console.error("Failed to delete invoice", err);
-            toast.error("Silme başarısız.");
+            toast.error(t('invoices.deleteFail'));
         }
     };
 
@@ -82,7 +84,7 @@ export function InvoiceProcessing() {
 
     const handleFileUpload = async (file: File) => {
         if (file.type !== 'application/pdf') {
-            toast.error("Lütfen bir PDF dosyası yükleyin.");
+            toast.error(t('invoices.pdfError'));
             return;
         }
 
@@ -93,7 +95,7 @@ export function InvoiceProcessing() {
             await loadInvoices();
         } catch (error) {
             console.error("Upload failed", error);
-            toast.error("Fatura yüklenirken hata oluştu.");
+            toast.error(t('invoices.uploadError'));
         } finally {
             setIsUploading(false);
         }
@@ -104,12 +106,12 @@ export function InvoiceProcessing() {
         try {
             setIsApproving(true);
             await approveInvoice(activeInvoice.id);
-            toast.success('Fatura başarıyla onaylandı ve stoğa işlendi!');
+            toast.success(t('invoices.approveSuccess'));
             setActiveInvoice(null);
             await loadInvoices();
         } catch (err) {
             console.error("Approve failed", err);
-            toast.error('Fatura onaylanırken bir hata oluştu.');
+            toast.error(t('invoices.approveFail'));
         } finally {
             setIsApproving(false);
         }
@@ -117,7 +119,7 @@ export function InvoiceProcessing() {
 
     const handleDeleteItem = async (itemId: string) => {
         if (!activeInvoice) return;
-        if (!confirm("Bu öğeyi listeden çıkarmak istediğinize emin misiniz?")) return;
+        if (!confirm(t('invoices.confirmItemDelete'))) return;
         try {
             await deleteInvoiceItem(itemId);
             // Refresh active invoice details
@@ -153,13 +155,13 @@ export function InvoiceProcessing() {
     return (
         <div className="space-y-6 h-full flex flex-col">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold tracking-tight">Invoice Processing & Staging</h1>
+                <h1 className="text-3xl font-bold tracking-tight">{t('invoices.title')}</h1>
                 {activeInvoice && unprocessedItemsCount > 0 && (
                     <Button onClick={handleApprove} disabled={isApproving}
                             className="bg-green-600 hover:bg-green-700 text-white border-0">
                         {isApproving ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> :
                             <CheckCircle className="mr-2 h-4 w-4"/>}
-                        Faturayı Onayla ({unprocessedItemsCount} Öğeyi İşle)
+                        {t('invoices.approveButton')} ({unprocessedItemsCount} {t('invoices.itemsToProcess')})
                     </Button>
                 )}
             </div>
@@ -173,19 +175,19 @@ export function InvoiceProcessing() {
                         variant={activeInvoice === null ? "default" : "outline"}
                         onClick={() => setActiveInvoice(null)}
                     >
-                        <Plus className="mr-2 h-4 w-4"/> Yeni Fatura Yükle
+                        <Plus className="mr-2 h-4 w-4"/> {t('invoices.newInvoice')}
                     </Button>
 
                     <Card className="flex-1 flex flex-col min-h-0">
                         <CardHeader className="py-4">
-                            <CardTitle className="text-sm">Geçmiş Faturalar</CardTitle>
+                            <CardTitle className="text-sm">{t('invoices.history')}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex-1 overflow-auto p-0">
                             {isLoadingList ? (
                                 <div className="p-4 flex justify-center"><Loader2
                                     className="h-6 w-6 animate-spin text-muted-foreground"/></div>
                             ) : invoices.length === 0 ? (
-                                <div className="p-4 text-sm text-muted-foreground text-center">Fatura bulunamadı.</div>
+                                <div className="p-4 text-sm text-muted-foreground text-center">{t('invoices.emptyHistory')}</div>
                             ) : (
                                 <div className="flex flex-col divide-y">
                                     {invoices.map(inv => (
@@ -236,14 +238,14 @@ export function InvoiceProcessing() {
                                     <UploadCloud className="h-10 w-10 text-primary"/>}
                             </div>
                             <h3 className="text-xl font-semibold mb-2">
-                                {isUploading ? "Yapay Zeka Faturayı Okuyor..." : "PDF Fatura Yükle"}
+                                {isUploading ? t('invoices.uploading') : t('invoices.uploadTitle')}
                             </h3>
                             <p className="text-muted-foreground mb-6 text-center max-w-md">
                                 {isUploading
-                                    ? "Bu işlem fatura boyutuna göre birkaç saniye sürebilir."
-                                    : "Tedarikçi faturanızı buraya sürükleyin veya seçmek için tıklayın. AI sistemimiz parçaları otomatik ayıklayacaktır."}
+                                    ? t('invoices.uploadDescUploading')
+                                    : t('invoices.uploadDesc')}
                             </p>
-                            {!isUploading && <Button variant="outline">Dosya Seç</Button>}
+                            {!isUploading && <Button variant="outline">{t('invoices.selectFile')}</Button>}
                         </div>
                     ) : (
                         // Detail UI
@@ -252,29 +254,27 @@ export function InvoiceProcessing() {
                                 <div>
                                     <CardTitle className="flex items-center space-x-2">
                                         <File className="h-5 w-5 text-blue-500"/>
-                                        <span>{activeInvoice.store_name} Faturası</span>
+                                        <span>{activeInvoice.store_name} {t('invoices.invoiceOf')}</span>
                                     </CardTitle>
                                     <p className="text-sm text-muted-foreground mt-1">
-                                        Yüklenme: {new Date(activeInvoice.created_at).toLocaleString()}
+                                        {t('invoices.uploadedAt')} {new Date(activeInvoice.created_at).toLocaleString()}
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-sm font-medium">Toplam
-                                        Tutar: {activeInvoice.total_amount ? `₺${activeInvoice.total_amount}` : '-'}</p>
+                                    <p className="text-sm font-medium">{t('invoices.totalAmount')} {activeInvoice.total_amount ? `₺${activeInvoice.total_amount}` : '-'}</p>
                                 </div>
                             </CardHeader>
                             <CardContent className="flex-1 overflow-auto p-0 border-t">
                                 {activeInvoice.items.length === 0 ? (
-                                    <div className="flex justify-center items-center h-48 text-muted-foreground">Bu
-                                        faturada işlenecek parça bulunamadı.</div>
+                                    <div className="flex justify-center items-center h-48 text-muted-foreground">{t('invoices.emptyInvoice')}</div>
                                 ) : (
                                     <Table>
                                         <TableHeader className="bg-muted/50 sticky top-0">
                                             <TableRow>
-                                                <TableHead>Raw Name</TableHead>
-                                                <TableHead>Clean Name</TableHead>
-                                                <TableHead className="w-24">Qty</TableHead>
-                                                <TableHead className="w-48">Category</TableHead>
+                                                <TableHead>{t('invoices.table.raw')}</TableHead>
+                                                <TableHead>{t('invoices.table.clean')}</TableHead>
+                                                <TableHead className="w-24">{t('invoices.table.qty')}</TableHead>
+                                                <TableHead className="w-48">{t('invoices.table.cat')}</TableHead>
                                                 <TableHead className="w-16"></TableHead>
                                             </TableRow>
                                         </TableHeader>
@@ -310,7 +310,7 @@ export function InvoiceProcessing() {
                                                             onChange={(e) => handleItemChange(item.id, 'category_name', e.target.value)}
                                                             disabled={item.is_processed}
                                                             className="h-8"
-                                                            placeholder="Kategori Girin"
+                                                            placeholder={t('invoices.table.catPlaceholder')}
                                                         />
                                                     </TableCell>
                                                     <TableCell>
