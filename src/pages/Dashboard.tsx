@@ -1,22 +1,50 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Package, Tags, FileClock, Sparkles } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { useNavigate } from 'react-router-dom';
+import { fetchComponents, fetchCategories } from '../lib/api';
+import type { ComponentItem } from '../types';
 
 export function Dashboard() {
   const navigate = useNavigate();
+  const [components, setComponents] = useState<ComponentItem[]>([]);
+  const [categoryCount, setCategoryCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      try {
+        const [comps, cats] = await Promise.all([
+          fetchComponents(),
+          fetchCategories()
+        ]);
+        setComponents(comps);
+        setCategoryCount(cats.length || 0);
+      } catch (err) {
+        console.error("Failed to load dashboard metrics", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboardData();
+  }, []);
+
+  const totalComponents = components.length;
+  // This is a dummy count for unprocessed invoices for UI sake
+  const unprocessedInvoices = 3; 
+
+  const recentActivity = components.slice(0, 5).map(c => ({
+    id: c.id,
+    name: c.name,
+    qty: c.quantity,
+    status: c.quantity < 5 ? 'Low Stock' : 'In Stock'
+  }));
 
   const metrics = [
-    { title: 'Total Unique Components', value: '1,248', icon: Package, color: 'text-blue-500' },
-    { title: 'Active Categories', value: '42', icon: Tags, color: 'text-purple-500' },
-    { title: 'Unprocessed Invoices', value: '3', icon: FileClock, color: 'text-orange-500' },
-  ];
-
-  const recentActivity = [
-    { id: '1', name: 'ESP32-WROOM-32', qty: 2, status: 'Low Stock' },
-    { id: '2', name: '10k Ohm Resistor', qty: 500, status: 'In Stock' },
-    { id: '3', name: 'BME280 Sensor', qty: 4, status: 'Low Stock' },
+    { title: 'Total Unique Components', value: loading ? '...' : totalComponents.toString(), icon: Package, color: 'text-blue-500' },
+    { title: 'Active Categories', value: loading ? '...' : categoryCount.toString(), icon: Tags, color: 'text-purple-500' },
+    { title: 'Unprocessed Invoices', value: unprocessedInvoices.toString(), icon: FileClock, color: 'text-orange-500' },
   ];
 
   return (
@@ -53,24 +81,30 @@ export function Dashboard() {
           <CardTitle>Recent Activity & Low Stock Warnings</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {recentActivity.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-card/50">
-                <div className="flex items-center space-x-4">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Package className="h-5 w-5 text-primary" />
+          {loading ? (
+             <div className="animate-pulse text-sm text-muted-foreground">Loading...</div>
+          ) : recentActivity.length === 0 ? (
+             <div className="text-sm text-muted-foreground">No recent activity</div>
+          ) : (
+            <div className="space-y-4">
+              {recentActivity.map((item) => (
+                <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-card/50">
+                  <div className="flex items-center space-x-4">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Package className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium leading-none">{item.name}</p>
+                      <p className="text-sm text-muted-foreground mt-1">Quantity: {item.qty}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium leading-none">{item.name}</p>
-                    <p className="text-sm text-muted-foreground mt-1">Quantity: {item.qty}</p>
+                  <div className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.qty < 5 ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>
+                    {item.status}
                   </div>
                 </div>
-                <div className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${item.qty < 5 ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'}`}>
-                  {item.status}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

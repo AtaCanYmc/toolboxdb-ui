@@ -1,22 +1,164 @@
-import React from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Sparkles, Loader2, CheckCircle2, Circle } from 'lucide-react';
+import { generateProjectIdeas } from '../lib/api';
+import type { AIProjectSuggestion } from '../types';
 
 export function AIGenerator() {
+  const [extraComponents, setExtraComponents] = useState('');
+  const [difficulty, setDifficulty] = useState('Medium');
+  const [extraMessage, setExtraMessage] = useState('');
+  
+  const [loading, setLoading] = useState(false);
+  const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(null);
+
+  const handleGenerate = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        extra_components: extraComponents.split(',').map(s => s.trim()).filter(Boolean),
+        difficulty_level: difficulty,
+        extra_message: extraMessage
+      };
+      // For this endpoint, assuming it returns a single project suggestion object or an array. 
+      // Adjusting based on standard response expectations:
+      const res = await generateProjectIdeas(payload);
+      // If it returns an array of suggestions, we take the first one, or if it returns an object directly:
+      const data = Array.isArray(res) ? res[0] : res;
+      setSuggestion(data);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate project ideas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">AI Project Suggestion Hub</h1>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Yaratıcı Proje Üretim Merkezi</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-64 text-muted-foreground border-2 border-dashed border-border rounded-xl">
-            AI Idea Generator Interface goes here
-          </div>
-        </CardContent>
-      </Card>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Form Panel */}
+        <div className="col-span-1 lg:col-span-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Yaratıcı Proje Üretim Merkezi</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Extra Components (comma separated)</label>
+                <Input 
+                  placeholder="e.g. OLED Ekran i2c, SG90 Servo" 
+                  value={extraComponents}
+                  onChange={(e) => setExtraComponents(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Difficulty Level</label>
+                <select 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Extra Message</label>
+                <textarea 
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Akıllı ev odaklı bir şeyler olsun..."
+                  value={extraMessage}
+                  onChange={(e) => setExtraMessage(e.target.value)}
+                />
+              </div>
+              
+              <Button 
+                onClick={handleGenerate} 
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
+              >
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                {loading ? 'Fikir Üretiliyor...' : 'Proje Fikri Üret'}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Results Panel */}
+        <div className="col-span-1 lg:col-span-8">
+          {suggestion ? (
+             <Card className="border-primary/50 shadow-md shadow-primary/10">
+               <CardHeader className="border-b border-border bg-muted/20">
+                 <div className="flex items-start justify-between">
+                   <div>
+                     <CardTitle className="text-2xl text-primary">{suggestion.title || 'Harika Bir Proje Fikri'}</CardTitle>
+                     <p className="text-sm text-muted-foreground mt-2">{suggestion.description}</p>
+                   </div>
+                   <div className="flex flex-col items-end space-y-1">
+                     <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-500">
+                       {suggestion.difficulty || difficulty}
+                     </span>
+                     <span className="text-xs text-muted-foreground font-mono">
+                       {suggestion.build_time || 'Tahmini 2-3 Saat'}
+                     </span>
+                   </div>
+                 </div>
+               </CardHeader>
+               <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div>
+                   <h3 className="text-lg font-semibold mb-4">Gerekli Parçalar</h3>
+                   <ul className="space-y-3">
+                     {suggestion.required_pieces?.map((piece, idx) => (
+                       <li key={idx} className="flex items-start space-x-3">
+                         {piece.status === 'Mevcut' ? (
+                           <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                         ) : (
+                           <Circle className="h-5 w-5 text-orange-500 shrink-0" />
+                         )}
+                         <div className="flex-1 flex justify-between items-center border-b border-border/50 pb-1">
+                           <span className="text-sm font-medium">{piece.name}</span>
+                           <span className={`text-xs ${piece.status === 'Mevcut' ? 'text-green-500' : 'text-orange-500'}`}>
+                             {piece.status}
+                           </span>
+                         </div>
+                       </li>
+                     ))}
+                   </ul>
+                 </div>
+                 
+                 <div>
+                   <h3 className="text-lg font-semibold mb-4">Uygulama Adımları</h3>
+                   <ol className="space-y-4">
+                     {suggestion.steps?.map((step, idx) => (
+                       <li key={idx} className="flex space-x-3">
+                         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                           {idx + 1}
+                         </span>
+                         <span className="text-sm text-muted-foreground leading-relaxed">
+                           {step}
+                         </span>
+                       </li>
+                     ))}
+                   </ol>
+                 </div>
+               </CardContent>
+             </Card>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
+              <Sparkles className="h-12 w-12 text-muted-foreground/30 mb-4" />
+              <p>Proje fikirleri oluşturmak için soldaki formu doldurun.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

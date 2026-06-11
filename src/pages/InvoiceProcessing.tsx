@@ -5,37 +5,51 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import type { InvoiceExtractedItem } from '../types';
+import { uploadInvoice, approveInvoice } from '../lib/api';
 
 export function InvoiceProcessing() {
   const [file, setFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedItems, setParsedItems] = useState<InvoiceExtractedItem[]>([]);
 
+  const [activeInvoiceId, setActiveInvoiceId] = useState<string>('');
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
       if (droppedFile.type === 'application/pdf') {
         setFile(droppedFile);
-        simulateParse();
+        try {
+          setIsParsing(true);
+          const response = await uploadInvoice(droppedFile);
+          setActiveInvoiceId(response.id);
+          setParsedItems(response.items || []);
+        } catch (error) {
+          console.error("Upload failed", error);
+        } finally {
+          setIsParsing(false);
+        }
       }
     }
   };
 
-  const simulateParse = () => {
-    setIsParsing(true);
-    setTimeout(() => {
-      setParsedItems([
-        { id: '1', raw_name: 'RES 10K 1/4W 1%', clean_name: '10k Ohm Resistor', quantity: 500, category: 'Passives' },
-        { id: '2', raw_name: 'IC ESP32-WROOM-32D', clean_name: 'ESP32-WROOM-32', quantity: 10, category: 'Microcontrollers' },
-        { id: '3', raw_name: 'CAP CER 0.1UF 50V X7R', clean_name: '0.1uF Ceramic Capacitor', quantity: 100, category: 'Passives' },
-      ]);
-      setIsParsing(false);
-    }, 2000);
+  const handleApprove = async () => {
+    if (!activeInvoiceId) return;
+    try {
+      await approveInvoice(activeInvoiceId);
+      alert('Fatura başarıyla onaylandı ve stoğa işlendi!');
+      setFile(null);
+      setParsedItems([]);
+      setActiveInvoiceId('');
+    } catch (err) {
+      console.error("Approve failed", err);
+      alert('Fatura onaylanırken bir hata oluştu.');
+    }
   };
 
   const handleItemChange = (id: string, field: keyof InvoiceExtractedItem, value: string | number) => {
@@ -47,7 +61,7 @@ export function InvoiceProcessing() {
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Invoice Processing & Staging</h1>
         {parsedItems.length > 0 && (
-          <Button className="bg-green-600 hover:bg-green-700 text-white border-0">
+          <Button onClick={handleApprove} className="bg-green-600 hover:bg-green-700 text-white border-0">
             <CheckCircle className="mr-2 h-4 w-4" />
             Faturayı Onayla ve Stoğa İşle
           </Button>
