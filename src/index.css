@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--bg);
+  --color-foreground: var(--text-h);
+  --color-muted: var(--text);
+  --color-border: var(--border);
+  --color-primary: var(--accent);
+  --color-primary-foreground: #ffffff;
+  --color-card: var(--code-bg);
+}
+
+@layer base {
+  :root {
+    --text: #6b6375;
+    --text-h: #08060d;
+    --bg: #ffffff;
+    --border: #e5e4e7;
+    --code-bg: #f8f9fa;
+    --accent: #3b82f6; /* Blue for a tech look */
+  }
+
+  .dark {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #09090b;      /* Zinc 950 for Vercel/Supabase sleek look */
+    --border: #27272a;  /* Zinc 800 */
+    --code-bg: #18181b; /* Zinc 900 */
+    --accent: #3b82f6;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
