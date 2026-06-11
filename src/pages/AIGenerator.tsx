@@ -14,44 +14,48 @@ export function AIGenerator() {
   const [extraComponents, setExtraComponents] = useState('');
   const [difficulty, setDifficulty] = useState('Beginner');
   const [extraMessage, setExtraMessage] = useState('');
-  
   const [loading, setLoading] = useState(false);
-  const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(() => {
-    const saved = sessionStorage.getItem('ai_suggestion');
+  
+  const [suggestions, setSuggestions] = useState<AIProjectSuggestion[]>(() => {
+    const saved = sessionStorage.getItem('ai_suggestions');
     if (saved) {
-      try { return JSON.parse(saved); } catch { return null; }
+      try { return JSON.parse(saved); } catch { return []; }
     }
-    return null;
+    return [];
   });
-  const [detailLoading, setDetailLoading] = useState(false);
-  const [details, setDetails] = useState<ProjectDetailResponse | null>(() => {
-    const saved = sessionStorage.getItem('ai_details');
+  const [detailLoadingMap, setDetailLoadingMap] = useState<Record<number, boolean>>({});
+  const [detailsMap, setDetailsMap] = useState<Record<number, ProjectDetailResponse>>(() => {
+    const saved = sessionStorage.getItem('ai_details_map');
     if (saved) {
-      try { return JSON.parse(saved); } catch { return null; }
+      try { return JSON.parse(saved); } catch { return {}; }
     }
-    return null;
+    return {};
   });
 
   const handleGenerate = async () => {
     setLoading(true);
-    setDetails(null);
-    sessionStorage.removeItem('ai_details');
+    setDetailsMap({});
+    sessionStorage.removeItem('ai_details_map');
+    setSuggestions([]);
+    sessionStorage.removeItem('ai_suggestions');
     try {
       const payload = {
         focus_area: focusArea,
-        extra_components: extraComponents.split(',') || undefined,
+        extra_components: extraComponents ? extraComponents.split(',').map(s => s.trim()) : undefined,
         difficulty_level: difficulty || undefined,
         extra_message: extraMessage || undefined,
       };
       const res = await generateProjectIdeas(payload);
-      let data = res;
-      if (res.ideas && Array.isArray(res.ideas) && res.ideas.length > 0) {
-        data = res.ideas[0];
+      let data: AIProjectSuggestion[] = [];
+      if (res.ideas && Array.isArray(res.ideas)) {
+        data = res.ideas;
       } else if (Array.isArray(res)) {
-        data = res[0];
+        data = res;
+      } else if (res) {
+        data = [res];
       }
-      setSuggestion(data);
-      sessionStorage.setItem('ai_suggestion', JSON.stringify(data));
+      setSuggestions(data);
+      sessionStorage.setItem('ai_suggestions', JSON.stringify(data));
     } catch (err) {
       console.error(err);
       toast.error(t('ai.generateFail'));
@@ -60,24 +64,25 @@ export function AIGenerator() {
     }
   };
 
-  const handleGetDetails = async () => {
-    if (!suggestion) return;
-    setDetailLoading(true);
+  const handleGetDetails = async (ideaIndex: number, idea: AIProjectSuggestion) => {
+    setDetailLoadingMap(prev => ({ ...prev, [ideaIndex]: true }));
     try {
       const payload = {
-        project_title: suggestion.title,
-        project_description: suggestion.description,
-        difficulty: suggestion.difficulty,
-        components: suggestion.components_breakdown?.map(c => c.name) || [],
+        project_title: idea.title,
+        project_description: idea.description,
+        difficulty: idea.difficulty,
+        components: idea.components_breakdown?.map(c => c.name) || [],
       };
       const res = await getProjectDetails(payload);
-      setDetails(res);
-      sessionStorage.setItem('ai_details', JSON.stringify(res));
+      
+      const newDetailsMap = { ...detailsMap, [ideaIndex]: res };
+      setDetailsMap(newDetailsMap);
+      sessionStorage.setItem('ai_details_map', JSON.stringify(newDetailsMap));
     } catch (err) {
       console.error(err);
       toast.error(t('ai.generateFail'));
     } finally {
-      setDetailLoading(false);
+      setDetailLoadingMap(prev => ({ ...prev, [ideaIndex]: false }));
     }
   };
 
@@ -149,20 +154,21 @@ export function AIGenerator() {
         </div>
 
         {/* Right Results Panel */}
-        <div className="col-span-1 lg:col-span-8">
-          {suggestion ? (
-             <Card className="border-primary/50 shadow-md shadow-primary/10">
+        <div className="col-span-1 lg:col-span-8 space-y-6">
+          {suggestions && suggestions.length > 0 ? (
+            suggestions.map((suggestion, index) => (
+             <Card key={index} className="border-primary/50 shadow-md shadow-primary/10">
                <CardHeader className="border-b border-border bg-muted/20">
                  <div className="flex items-start justify-between">
                    <div>
                      <CardTitle className="text-2xl text-primary">{suggestion.title || t('ai.defaultTitle')}</CardTitle>
                      <p className="text-sm text-muted-foreground mt-2">{suggestion.description}</p>
                    </div>
-                   <div className="flex flex-col items-end space-y-1">
+                   <div className="flex flex-col items-end space-y-1 shrink-0 ml-4">
                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-500">
                        {suggestion.difficulty || t('ai.defaultDiff')}
                      </span>
-                     <span className="text-xs text-muted-foreground font-mono">
+                     <span className="text-xs text-muted-foreground font-mono whitespace-nowrap">
                        {suggestion.estimated_build_time_hours ? `${suggestion.estimated_build_time_hours} hours` : t('ai.defaultTime')}
                      </span>
                    </div>
@@ -208,14 +214,14 @@ export function AIGenerator() {
                </CardContent>
                
                <div className="p-6 pt-0 border-t border-border/50 mt-4">
-                 {!details ? (
+                 {!detailsMap[index] ? (
                    <Button 
-                     onClick={handleGetDetails} 
-                     disabled={detailLoading}
+                     onClick={() => handleGetDetails(index, suggestion)} 
+                     disabled={detailLoadingMap[index]}
                      variant="outline"
                      className="w-full mt-4"
                    >
-                     {detailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                     {detailLoadingMap[index] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                      {t('ai.getDetails', 'Detaylandır / Get Details')}
                    </Button>
                  ) : (
@@ -223,19 +229,20 @@ export function AIGenerator() {
                      <div>
                        <h3 className="text-lg font-semibold mb-2">{t('ai.wiring', 'Devre Şeması (Wiring Guide)')}</h3>
                        <div className="bg-muted p-4 rounded-md border border-border overflow-x-auto">
-                         <pre className="text-sm font-mono whitespace-pre-wrap">{details.wiring_guide}</pre>
+                         <pre className="text-sm font-mono whitespace-pre-wrap">{detailsMap[index].wiring_guide}</pre>
                        </div>
                      </div>
                      <div>
                        <h3 className="text-lg font-semibold mb-2">{t('ai.code', 'Örnek Kod (Code Sketch)')}</h3>
                        <div className="bg-zinc-950 p-4 rounded-md border border-zinc-800 overflow-x-auto">
-                         <pre className="text-sm font-mono text-emerald-400 whitespace-pre-wrap">{details.code_sketch}</pre>
+                         <pre className="text-sm font-mono text-emerald-400 whitespace-pre-wrap">{detailsMap[index].code_sketch}</pre>
                        </div>
                      </div>
                    </div>
                  )}
                </div>
              </Card>
+            ))
           ) : (
              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
                <Sparkles className="h-12 w-12 text-muted-foreground/30 mb-4" />
