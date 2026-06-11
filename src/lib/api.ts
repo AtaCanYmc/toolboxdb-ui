@@ -89,3 +89,47 @@ export async function generateProjectIdeas(payload: { focus_area: string }) {
   if (!response.ok) throw new Error('Failed to generate project ideas');
   return response.json();
 }
+
+export async function fetchInvoices() {
+  const response = await fetch(`${BASE_URL}/invoices/?skip=0&limit=100`, {
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch invoices');
+  return response.json();
+}
+
+export async function fetchInvoiceDetail(id: string) {
+  const response = await fetch(`${BASE_URL}/invoices/${id}`, {
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch invoice details');
+  return response.json();
+}
+
+export async function updateInvoiceItem(itemId: string, payload: { clean_name?: string; quantity?: number; category_name?: string }) {
+  const response = await fetch(`${BASE_URL}/invoices/items/${itemId}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(payload)
+  });
+  if (!response.ok) throw new Error('Failed to update invoice item');
+  return response.json();
+}
+
+export async function deleteInvoiceItem(itemId: string) {
+  const response = await fetch(`${BASE_URL}/invoices/items/${itemId}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to delete invoice item');
+  return true;
+}
+
+export async function deleteInvoice(id: string) {
+  const response = await fetch(`${BASE_URL}/invoices/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to delete invoice');
+  return true;
+}

@@ -6,12 +6,25 @@ export interface ComponentItem {
   created_at: string;
 }
 
-export interface InvoiceExtractedItem {
+export interface InvoiceItem {
   id: string;
+  invoice_id: string;
   raw_name: string;
-  clean_name: string;
+  clean_name: string | null;
   quantity: number;
-  category: string;
+  category_name: string | null;
+  is_processed: boolean;
+  created_at: string;
+}
+
+export interface Invoice {
+  id: string;
+  store_name: string;
+  invoice_date: string | null;
+  total_amount: number | null;
+  file_path: string | null;
+  created_at: string;
+  items: InvoiceItem[];
 }
 
 export interface AIProjectPiece {
