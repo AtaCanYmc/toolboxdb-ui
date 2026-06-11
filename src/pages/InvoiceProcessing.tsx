@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { UploadCloud, File, CheckCircle, AlertCircle } from 'lucide-react';
+import { UploadCloud, File, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
-import { InvoiceExtractedItem } from '../types';
+import type { InvoiceExtractedItem } from '../types';
 
 export function InvoiceProcessing() {
   const [file, setFile] = useState<File | null>(null);
