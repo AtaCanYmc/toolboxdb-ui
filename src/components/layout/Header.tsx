@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Moon, Sun, Bell, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Moon, Sun, Bell, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function Header() {
   const [isDark, setIsDark] = useState(true);
+  const { logout } = useAuth();
 
   useEffect(() => {
     if (isDark) {
@@ -32,6 +34,9 @@ export function Header() {
         <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
           <User className="h-4 w-4" />
         </div>
+        <Button variant="ghost" size="icon" onClick={logout} title="Logout">
+          <LogOut className="h-5 w-5 text-red-500" />
+        </Button>
       </div>
     </header>
   );

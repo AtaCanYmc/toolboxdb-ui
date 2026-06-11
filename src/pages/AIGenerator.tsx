@@ -7,9 +7,7 @@ import { generateProjectIdeas } from '../lib/api';
 import type { AIProjectSuggestion } from '../types';
 
 export function AIGenerator() {
-  const [extraComponents, setExtraComponents] = useState('');
-  const [difficulty, setDifficulty] = useState('Medium');
-  const [extraMessage, setExtraMessage] = useState('');
+  const [focusArea, setFocusArea] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(null);
@@ -18,14 +16,9 @@ export function AIGenerator() {
     setLoading(true);
     try {
       const payload = {
-        extra_components: extraComponents.split(',').map(s => s.trim()).filter(Boolean),
-        difficulty_level: difficulty,
-        extra_message: extraMessage
+        focus_area: focusArea
       };
-      // For this endpoint, assuming it returns a single project suggestion object or an array. 
-      // Adjusting based on standard response expectations:
       const res = await generateProjectIdeas(payload);
-      // If it returns an array of suggestions, we take the first one, or if it returns an object directly:
       const data = Array.isArray(res) ? res[0] : res;
       setSuggestion(data);
     } catch (err) {
@@ -51,38 +44,17 @@ export function AIGenerator() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Extra Components (comma separated)</label>
+                <label className="text-sm font-medium">Focus Area (Theme)</label>
                 <Input 
-                  placeholder="e.g. OLED Ekran i2c, SG90 Servo" 
-                  value={extraComponents}
-                  onChange={(e) => setExtraComponents(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Difficulty Level</label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Advanced">Advanced</option>
-                </select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Extra Message</label>
-                <textarea 
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  placeholder="Akıllı ev odaklı bir şeyler olsun..."
-                  value={extraMessage}
-                  onChange={(e) => setExtraMessage(e.target.value)}
+                  placeholder="e.g. IoT, Smart Home, Robotics" 
+                  value={focusArea}
+                  onChange={(e) => setFocusArea(e.target.value)}
                 />
               </div>
               
               <Button 
                 onClick={handleGenerate} 
-                disabled={loading}
+                disabled={loading || !focusArea.trim()}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
@@ -104,7 +76,7 @@ export function AIGenerator() {
                    </div>
                    <div className="flex flex-col items-end space-y-1">
                      <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-500">
-                       {suggestion.difficulty || difficulty}
+                       {suggestion.difficulty || 'Medium'}
                      </span>
                      <span className="text-xs text-muted-foreground font-mono">
                        {suggestion.build_time || 'Tahmini 2-3 Saat'}
