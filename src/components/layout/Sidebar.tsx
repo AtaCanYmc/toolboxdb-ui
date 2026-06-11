@@ -38,10 +38,20 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="p-4 border-t border-border">
-        <button className="flex items-center space-x-3 px-3 py-2 w-full rounded-md transition-colors text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-foreground">
+        <NavLink 
+          to="/settings"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center space-x-3 px-3 py-2 w-full rounded-md transition-colors text-sm font-medium',
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+            )
+          }
+        >
           <Settings className="h-5 w-5" />
           <span>Settings</span>
-        </button>
+        </NavLink>
       </div>
     </aside>
   );

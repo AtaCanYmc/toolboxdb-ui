@@ -1,21 +1,13 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Moon, Sun, Bell, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 
 export function Header() {
-  const [isDark, setIsDark] = useState(true);
+  const { isDark, setTheme } = useSettings();
   const { logout } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDark]);
 
   return (
     <header className="h-16 border-b border-border bg-card/80 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between px-6">
@@ -27,7 +19,7 @@ export function Header() {
       <div className="hidden md:block flex-1" />
       
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" onClick={() => setIsDark(!isDark)}>
+        <Button variant="ghost" size="icon" onClick={() => setTheme(isDark ? 'light' : 'dark')}>
           {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
         </Button>
         <Button variant="ghost" size="icon">

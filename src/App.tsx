@@ -7,8 +7,10 @@ import { InventoryList } from './pages/InventoryList';
 import { AIGenerator } from './pages/AIGenerator';
 import { Categories } from './pages/Categories';
 import { Profile } from './pages/Profile';
+import { Settings } from './pages/Settings';
 import { Login } from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -20,8 +22,9 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <AuthProvider>
-      <Toaster position="top-right" />
+    <SettingsProvider>
+      <AuthProvider>
+        <Toaster position="top-right" />
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -32,10 +35,12 @@ function App() {
             <Route path="categories" element={<Categories />} />
             <Route path="ai-generator" element={<AIGenerator />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>
       </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </SettingsProvider>
   );
 }
 
