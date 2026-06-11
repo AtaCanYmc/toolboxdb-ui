@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Moon, Sun, Bell, User, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 export function Header() {
   const [isDark, setIsDark] = useState(true);
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isDark) {
@@ -31,7 +33,11 @@ export function Header() {
         <Button variant="ghost" size="icon">
           <Bell className="h-5 w-5" />
         </Button>
-        <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium">
+        <div 
+          onClick={() => navigate('/profile')}
+          className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-medium cursor-pointer hover:bg-primary/30 transition-colors"
+          title="Profile"
+        >
           <User className="h-4 w-4" />
         </div>
         <Button variant="ghost" size="icon" onClick={logout} title="Logout">

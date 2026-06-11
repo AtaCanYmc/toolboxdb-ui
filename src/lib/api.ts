@@ -39,6 +39,14 @@ export async function login(username: string, password: string) {
   return response.json(); // { access_token, token_type }
 }
 
+export async function fetchProfile() {
+  const response = await fetch(`${BASE_URL}/auth/me`, {
+    headers: getHeaders()
+  });
+  if (!response.ok) throw new Error('Failed to fetch profile');
+  return response.json();
+}
+
 export async function fetchCategories() {
   const response = await fetch(`${BASE_URL}/category/?skip=0&limit=100`, {
     headers: getHeaders()
