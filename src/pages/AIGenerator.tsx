@@ -11,19 +11,41 @@ import type { AIProjectSuggestion } from '../types';
 export function AIGenerator() {
   const { t } = useTranslation();
   const [focusArea, setFocusArea] = useState('');
+  const [extraComponents, setExtraComponents] = useState('');
+  const [difficulty, setDifficulty] = useState('Beginner');
+  const [extraMessage, setExtraMessage] = useState('');
   
   const [loading, setLoading] = useState(false);
-  const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(null);
+  const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(() => {
+    const saved = sessionStorage.getItem('ai_suggestion');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
 
   const handleGenerate = async () => {
     setLoading(true);
     try {
       const payload = {
-        focus_area: focusArea
+        focus_area: focusArea,
+        extra_components: extraComponents.split(',') || undefined,
+        difficulty_level: difficulty || undefined,
+        extra_message: extraMessage || undefined,
       };
       const res = await generateProjectIdeas(payload);
-      const data = Array.isArray(res) ? res[0] : res;
+      let data = res;
+      if (res.ideas && Array.isArray(res.ideas) && res.ideas.length > 0) {
+        data = res.ideas[0];
+      } else if (Array.isArray(res)) {
+        data = res[0];
+      }
       setSuggestion(data);
+      sessionStorage.setItem('ai_suggestion', JSON.stringify(data));
     } catch (err) {
       console.error(err);
       toast.error(t('ai.generateFail'));
@@ -54,6 +76,38 @@ export function AIGenerator() {
                   onChange={(e) => setFocusArea(e.target.value)}
                 />
               </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Extra Components</label>
+                <Input 
+                  placeholder="e.g. Arduino, Relay module..."
+                  value={extraComponents}
+                  onChange={(e) => setExtraComponents(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Difficulty Level</label>
+                <select 
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                >
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Extra Message</label>
+                <textarea 
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="Any extra context or message to AI..."
+                  value={extraMessage}
+                  onChange={(e) => setExtraMessage(e.target.value)}
+                />
+              </div>
               
               <Button 
                 onClick={handleGenerate} 
@@ -82,7 +136,7 @@ export function AIGenerator() {
                        {suggestion.difficulty || t('ai.defaultDiff')}
                      </span>
                      <span className="text-xs text-muted-foreground font-mono">
-                       {suggestion.build_time || t('ai.defaultTime')}
+                       {suggestion.estimated_build_time_hours ? `${suggestion.estimated_build_time_hours} hours` : t('ai.defaultTime')}
                      </span>
                    </div>
                  </div>
@@ -91,16 +145,16 @@ export function AIGenerator() {
                  <div>
                    <h3 className="text-lg font-semibold mb-4">{t('ai.requiredPieces')}</h3>
                    <ul className="space-y-3">
-                     {suggestion.required_pieces?.map((piece, idx) => (
+                     {suggestion.components_breakdown?.map((piece, idx) => (
                        <li key={idx} className="flex items-start space-x-3">
-                         {piece.status === 'Mevcut' ? (
+                         {piece.status === 'Available' || piece.status === 'Mevcut' ? (
                            <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
                          ) : (
                            <Circle className="h-5 w-5 text-orange-500 shrink-0" />
                          )}
                          <div className="flex-1 flex justify-between items-center border-b border-border/50 pb-1">
                            <span className="text-sm font-medium">{piece.name}</span>
-                           <span className={`text-xs ${piece.status === 'Mevcut' ? 'text-green-500' : 'text-orange-500'}`}>
+                           <span className={`text-xs ${piece.status === 'Available' || piece.status === 'Mevcut' ? 'text-green-500' : 'text-orange-500'}`}>
                              {piece.status}
                            </span>
                          </div>
@@ -112,7 +166,7 @@ export function AIGenerator() {
                  <div>
                    <h3 className="text-lg font-semibold mb-4">{t('ai.steps')}</h3>
                    <ol className="space-y-4">
-                     {suggestion.steps?.map((step, idx) => (
+                     {suggestion.step_by_step_summary?.map((step, idx) => (
                        <li key={idx} className="flex space-x-3">
                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                            {idx + 1}

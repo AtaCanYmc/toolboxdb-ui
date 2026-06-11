@@ -120,7 +120,7 @@ export async function approveInvoice(invoiceId: string) {
   return response.json();
 }
 
-export async function generateProjectIdeas(payload: { focus_area: string }) {
+export async function generateProjectIdeas(payload: { focus_area: string; extra_components?: string[]; difficulty_level?: string; extra_message?: string; }) {
   const response = await fetch(`${BASE_URL}/suggestions/project-ideas`, {
     method: 'POST',
     headers: getHeaders(),

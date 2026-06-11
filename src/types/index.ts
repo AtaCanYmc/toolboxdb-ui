@@ -44,17 +44,16 @@ export interface Invoice {
 
 export interface AIProjectPiece {
   name: string;
-  status: 'Mevcut' | 'Satın Alınmalı';
+  status: string;
 }
 
 export interface AIProjectSuggestion {
-  id: string;
   title: string;
   description: string;
-  build_time: string;
-  difficulty: 'Beginner' | 'Medium' | 'Advanced';
-  steps: string[];
-  required_pieces: AIProjectPiece[];
+  estimated_build_time_hours: number;
+  difficulty: string;
+  step_by_step_summary: string[];
+  components_breakdown: AIProjectPiece[];
 }
 
 export interface DashboardMetrics {
