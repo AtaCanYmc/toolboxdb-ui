@@ -8,6 +8,7 @@ import { AIGenerator } from './pages/AIGenerator';
 import { Categories } from './pages/Categories';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
+import { NotFound } from './pages/NotFound';
 import { Login } from './pages/Login';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
@@ -36,6 +37,7 @@ function App() {
             <Route path="ai-generator" element={<AIGenerator />} />
             <Route path="profile" element={<Profile />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </Router>

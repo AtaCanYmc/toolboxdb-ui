@@ -142,5 +142,11 @@
       "qty": "Quantity",
       "createdAt": "Created At"
     }
+  },
+  "notfound": {
+    "title": "404",
+    "subtitle": "Page Not Found",
+    "desc": "The page you are looking for doesn't exist or has been moved.",
+    "button": "Back to Dashboard"
   }
 }

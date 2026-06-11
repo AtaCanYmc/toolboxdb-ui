@@ -142,5 +142,11 @@
       "qty": "Adet",
       "createdAt": "Oluşturulma Tarihi"
     }
+  },
+  "notfound": {
+    "title": "404",
+    "subtitle": "Sayfa Bulunamadı",
+    "desc": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
+    "button": "Ana Panele Dön"
   }
 }
