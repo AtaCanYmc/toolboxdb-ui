@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Sparkles, Loader2, CheckCircle2, Circle } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 import { generateProjectIdeas } from '../lib/api';
 import type { AIProjectSuggestion } from '../types';
 
@@ -23,7 +24,7 @@ export function AIGenerator() {
       setSuggestion(data);
     } catch (err) {
       console.error(err);
-      alert('Failed to generate project ideas');
+      toast.error('Failed to generate project ideas');
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {UploadCloud, File, CheckCircle, Trash2, Loader2, Plus} from 'lucide-react';
 import {Card, CardContent, CardHeader, CardTitle} from '../components/ui/Card';
+import { toast } from 'react-hot-toast';
 import {Button} from '../components/ui/Button';
 import {Input} from '../components/ui/Input';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '../components/ui/Table';
@@ -58,7 +59,7 @@ export function InvoiceProcessing() {
             await loadInvoices();
         } catch (err) {
             console.error("Failed to delete invoice", err);
-            alert("Silme başarısız.");
+            toast.error("Silme başarısız.");
         }
     };
 
@@ -81,7 +82,7 @@ export function InvoiceProcessing() {
 
     const handleFileUpload = async (file: File) => {
         if (file.type !== 'application/pdf') {
-            alert("Lütfen bir PDF dosyası yükleyin.");
+            toast.error("Lütfen bir PDF dosyası yükleyin.");
             return;
         }
 
@@ -92,7 +93,7 @@ export function InvoiceProcessing() {
             await loadInvoices();
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Fatura yüklenirken hata oluştu.");
+            toast.error("Fatura yüklenirken hata oluştu.");
         } finally {
             setIsUploading(false);
         }
@@ -103,12 +104,12 @@ export function InvoiceProcessing() {
         try {
             setIsApproving(true);
             await approveInvoice(activeInvoice.id);
-            alert('Fatura başarıyla onaylandı ve stoğa işlendi!');
+            toast.success('Fatura başarıyla onaylandı ve stoğa işlendi!');
             setActiveInvoice(null);
             await loadInvoices();
         } catch (err) {
             console.error("Approve failed", err);
-            alert('Fatura onaylanırken bir hata oluştu.');
+            toast.error('Fatura onaylanırken bir hata oluştu.');
         } finally {
             setIsApproving(false);
         }

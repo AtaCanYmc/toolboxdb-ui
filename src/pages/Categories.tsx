@@ -4,6 +4,7 @@ import {Button} from '../components/ui/Button';
 import {Input} from '../components/ui/Input';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '../components/ui/Table';
 import {Tags, Loader2, Trash2, Edit2, Plus, X, Check} from 'lucide-react';
+import {toast} from 'react-hot-toast';
 import {fetchCategories, createCategory, updateCategory, deleteCategory} from '../lib/api';
 import type {Category} from '../types';
 
@@ -43,7 +44,7 @@ export function Categories() {
             await loadData();
         } catch (err) {
             console.error(err);
-            alert('Kategori oluşturulurken bir hata oluştu veya yetkiniz yok.');
+            toast.error('Kategori oluşturulurken bir hata oluştu veya yetkiniz yok.');
         } finally {
             setIsSubmitting(false);
         }
@@ -57,7 +58,7 @@ export function Categories() {
             await loadData();
         } catch (err) {
             console.error(err);
-            alert('Kategori silinirken bir hata oluştu veya yetkiniz yok.');
+            toast.error('Kategori silinirken bir hata oluştu veya yetkiniz yok.');
         }
     };
 
@@ -80,7 +81,7 @@ export function Categories() {
             await loadData();
         } catch (err) {
             console.error(err);
-            alert('Kategori güncellenirken bir hata oluştu veya yetkiniz yok.');
+            toast.error('Kategori güncellenirken bir hata oluştu veya yetkiniz yok.');
         }
     };
 

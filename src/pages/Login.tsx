@@ -5,25 +5,25 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useAuth } from '../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
     
     try {
       await login(username, password);
+      toast.success('Giriş başarılı!');
       navigate('/');
     } catch {
-      setError('Invalid credentials');
+      toast.error('Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -64,11 +64,7 @@ export function Login() {
               />
             </div>
             
-            {error && (
-              <div className="text-sm font-medium text-red-500">
-                {error}
-              </div>
-            )}
+            
             
             <Button 
               type="submit" 
