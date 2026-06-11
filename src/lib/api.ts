@@ -15,6 +15,8 @@ function getHeaders(isFormData = false) {
   if (!isFormData) {
     headers['Content-Type'] = 'application/json';
   }
+
+  headers['Accept-Language'] = localStorage.getItem('i18nextLng') || 'tr';
   
   return headers;
 }
@@ -24,10 +26,12 @@ export async function login(username: string, password: string) {
   formData.append('username', username);
   formData.append('password', password);
 
+  const lang = localStorage.getItem('i18nextLng') || 'tr';
   const response = await fetch(`${BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
+      'Accept-Language': lang,
     },
     body: formData.toString()
   });
