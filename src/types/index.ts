@@ -56,6 +56,13 @@ export interface AIProjectSuggestion {
   components_breakdown: AIProjectPiece[];
 }
 
+export interface ProjectDetailResponse {
+  project_name: string;
+  difficulty: string;
+  wiring_guide: string;
+  code_sketch: string;
+}
+
 export interface DashboardMetrics {
   total_unique_components: number;
   active_categories: number;

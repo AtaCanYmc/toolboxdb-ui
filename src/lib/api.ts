@@ -131,6 +131,17 @@ export async function generateProjectIdeas(payload: { focus_area: string; extra_
   return response.json();
 }
 
+export async function getProjectDetails(payload: { project_title: string; project_description: string; difficulty: string; components: string[]; }) {
+  const response = await fetch(`${BASE_URL}/suggestions/give-detail`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(payload)
+  });
+  
+  if (!response.ok) throw new Error('Failed to get project details');
+  return response.json();
+}
+
 export async function fetchInvoices() {
   const response = await fetch(`${BASE_URL}/invoices/?skip=0&limit=100`, {
     headers: getHeaders()

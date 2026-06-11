@@ -5,8 +5,8 @@ import { Input } from '../components/ui/Input';
 import { Sparkles, Loader2, CheckCircle2, Circle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generateProjectIdeas } from '../lib/api';
-import type { AIProjectSuggestion } from '../types';
+import { generateProjectIdeas, getProjectDetails } from '../lib/api';
+import type { AIProjectSuggestion, ProjectDetailResponse } from '../types';
 
 export function AIGenerator() {
   const { t } = useTranslation();
@@ -19,17 +19,23 @@ export function AIGenerator() {
   const [suggestion, setSuggestion] = useState<AIProjectSuggestion | null>(() => {
     const saved = sessionStorage.getItem('ai_suggestion');
     if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return null;
-      }
+      try { return JSON.parse(saved); } catch { return null; }
+    }
+    return null;
+  });
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [details, setDetails] = useState<ProjectDetailResponse | null>(() => {
+    const saved = sessionStorage.getItem('ai_details');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { return null; }
     }
     return null;
   });
 
   const handleGenerate = async () => {
     setLoading(true);
+    setDetails(null);
+    sessionStorage.removeItem('ai_details');
     try {
       const payload = {
         focus_area: focusArea,
@@ -51,6 +57,27 @@ export function AIGenerator() {
       toast.error(t('ai.generateFail'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGetDetails = async () => {
+    if (!suggestion) return;
+    setDetailLoading(true);
+    try {
+      const payload = {
+        project_title: suggestion.title,
+        project_description: suggestion.description,
+        difficulty: suggestion.difficulty,
+        components: suggestion.components_breakdown?.map(c => c.name) || [],
+      };
+      const res = await getProjectDetails(payload);
+      setDetails(res);
+      sessionStorage.setItem('ai_details', JSON.stringify(res));
+    } catch (err) {
+      console.error(err);
+      toast.error(t('ai.generateFail'));
+    } finally {
+      setDetailLoading(false);
     }
   };
 
@@ -179,6 +206,35 @@ export function AIGenerator() {
                    </ol>
                  </div>
                </CardContent>
+               
+               <div className="p-6 pt-0 border-t border-border/50 mt-4">
+                 {!details ? (
+                   <Button 
+                     onClick={handleGetDetails} 
+                     disabled={detailLoading}
+                     variant="outline"
+                     className="w-full mt-4"
+                   >
+                     {detailLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                     {t('ai.getDetails', 'Detaylandır / Get Details')}
+                   </Button>
+                 ) : (
+                   <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4">
+                     <div>
+                       <h3 className="text-lg font-semibold mb-2">{t('ai.wiring', 'Devre Şeması (Wiring Guide)')}</h3>
+                       <div className="bg-muted p-4 rounded-md border border-border overflow-x-auto">
+                         <pre className="text-sm font-mono whitespace-pre-wrap">{details.wiring_guide}</pre>
+                       </div>
+                     </div>
+                     <div>
+                       <h3 className="text-lg font-semibold mb-2">{t('ai.code', 'Örnek Kod (Code Sketch)')}</h3>
+                       <div className="bg-zinc-950 p-4 rounded-md border border-zinc-800 overflow-x-auto">
+                         <pre className="text-sm font-mono text-emerald-400 whitespace-pre-wrap">{details.code_sketch}</pre>
+                       </div>
+                     </div>
+                   </div>
+                 )}
+               </div>
              </Card>
           ) : (
              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
