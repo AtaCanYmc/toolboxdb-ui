@@ -1,256 +1,167 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Sparkles, Loader2, CheckCircle2, Circle } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { generateProjectIdeas, getProjectDetails } from '../lib/api';
-import type { AIProjectSuggestion, ProjectDetailResponse } from '../types';
+import React, {useState, useRef, useEffect} from 'react';
+import {Card, CardContent} from '../components/ui/Card';
+import {Button} from '../components/ui/Button';
+import {Input} from '../components/ui/Input';
+import {Sparkles, Send, Bot, User, Loader2} from 'lucide-react';
+import {toast} from 'react-hot-toast';
+import {useTranslation} from 'react-i18next';
+import {sendChatMessage} from '../lib/api';
+import type {ChatMessage, ChatResponse} from '../types';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export function AIGenerator() {
-  const { t } = useTranslation();
-  const [focusArea, setFocusArea] = useState('');
-  const [extraComponents, setExtraComponents] = useState('');
-  const [difficulty, setDifficulty] = useState('Beginner');
-  const [extraMessage, setExtraMessage] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const [suggestions, setSuggestions] = useState<AIProjectSuggestion[]>(() => {
-    const saved = sessionStorage.getItem('ai_suggestions');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return []; }
-    }
-    return [];
-  });
-  const [detailLoadingMap, setDetailLoadingMap] = useState<Record<number, boolean>>({});
-  const [detailsMap, setDetailsMap] = useState<Record<number, ProjectDetailResponse>>(() => {
-    const saved = sessionStorage.getItem('ai_details_map');
-    if (saved) {
-      try { return JSON.parse(saved); } catch { return {}; }
-    }
-    return {};
-  });
+    const {t} = useTranslation();
+    const [messages, setMessages] = useState<ChatMessage[]>(() => {
+        const saved = sessionStorage.getItem('ai_chat_history');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch {
+                return [];
+            }
+        }
+        return [
+            {
+                role: 'assistant',
+                content: 'Hello! I am your AI Hardware Consultant. Let me know what kind of project you want to build or if you need help optimizing your BOM.'
+            }
+        ];
+    });
+    const [input, setInput] = useState('');
+    const [loading, setLoading] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleGenerate = async () => {
-    setLoading(true);
-    setDetailsMap({});
-    sessionStorage.removeItem('ai_details_map');
-    setSuggestions([]);
-    sessionStorage.removeItem('ai_suggestions');
-    try {
-      const payload = {
-        focus_area: focusArea,
-        extra_components: extraComponents ? extraComponents.split(',').map(s => s.trim()) : undefined,
-        difficulty_level: difficulty || undefined,
-        extra_message: extraMessage || undefined,
-      };
-      const res = await generateProjectIdeas(payload);
-      let data: AIProjectSuggestion[] = [];
-      if (res.ideas && Array.isArray(res.ideas)) {
-        data = res.ideas;
-      } else if (Array.isArray(res)) {
-        data = res;
-      } else if (res) {
-        data = [res];
-      }
-      setSuggestions(data);
-      sessionStorage.setItem('ai_suggestions', JSON.stringify(data));
-    } catch (err) {
-      console.error(err);
-      toast.error(t('ai.generateFail'));
-    } finally {
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+        sessionStorage.setItem('ai_chat_history', JSON.stringify(messages));
+        messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+    }, [messages]);
 
-  const handleGetDetails = async (ideaIndex: number, idea: AIProjectSuggestion) => {
-    setDetailLoadingMap(prev => ({ ...prev, [ideaIndex]: true }));
-    try {
-      const payload = {
-        project_title: idea.title,
-        project_description: idea.description,
-        difficulty: idea.difficulty,
-        components: idea.components_breakdown?.map(c => c.name) || [],
-      };
-      const res = await getProjectDetails(payload);
-      
-      const newDetailsMap = { ...detailsMap, [ideaIndex]: res };
-      setDetailsMap(newDetailsMap);
-      sessionStorage.setItem('ai_details_map', JSON.stringify(newDetailsMap));
-    } catch (err) {
-      console.error(err);
-      toast.error(t('ai.generateFail'));
-    } finally {
-      setDetailLoadingMap(prev => ({ ...prev, [ideaIndex]: false }));
-    }
-  };
+    const handleSend = async () => {
+        if (!input.trim()) return;
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">{t('ai.title')}</h1>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Form Panel */}
-        <div className="col-span-1 lg:col-span-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('ai.cardTitle')}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('ai.focusArea')}</label>
-                <Input 
-                  placeholder={t('ai.focusPlaceholder')}
-                  value={focusArea}
-                  onChange={(e) => setFocusArea(e.target.value)}
-                />
-              </div>
+        const userMsg = input.trim();
+        setInput('');
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('ai.extraComponents')}</label>
-                <Input 
-                  placeholder={t('ai.extraComponentsPlaceholder')}
-                  value={extraComponents}
-                  onChange={(e) => setExtraComponents(e.target.value)}
-                />
-              </div>
+        // Optimistically update UI
+        const newMessages: ChatMessage[] = [...messages, {role: 'user', content: userMsg}];
+        setMessages(newMessages);
+        setLoading(true);
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('ai.difficultyLevel')}</label>
-                <select 
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value)}
-                >
-                  <option value="Beginner">{t('ai.difficultyBeginner')}</option>
-                  <option value="Intermediate">{t('ai.difficultyIntermediate')}</option>
-                  <option value="Advanced">{t('ai.difficultyAdvanced')}</option>
-                </select>
-              </div>
+        try {
+            // Backend payload expects current message + history.
+            // We pass the history prior to the current message so the backend appends the user message automatically.
+            const res: ChatResponse = await sendChatMessage({
+                message: userMsg,
+                history: messages
+            });
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium">{t('ai.extraMessage')}</label>
-                <textarea 
-                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  placeholder={t('ai.extraMessagePlaceholder')}
-                  value={extraMessage}
-                  onChange={(e) => setExtraMessage(e.target.value)}
-                />
-              </div>
-              
-              <Button 
-                onClick={handleGenerate} 
-                disabled={loading || !focusArea.trim()}
-                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0"
-              >
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                {loading ? t('ai.generating') : t('ai.generateBtn')}
-              </Button>
-            </CardContent>
-          </Card>
+            setMessages(prev => [...prev, {role: 'assistant', content: res.response}]);
+        } catch (err) {
+            console.error(err);
+            toast.error('Failed to communicate with AI');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend().catch(err => console.error("Error in handleSend", err));
+        }
+    };
+
+    const handleClear = () => {
+        const initial: ChatMessage[] = [{
+            role: 'assistant',
+            content: 'Hello! I am your AI Hardware Consultant. Let me know what kind of project you want to build or if you need help optimizing your BOM.'
+        }];
+        setMessages(initial);
+        sessionStorage.removeItem('ai_chat_history');
+    };
+
+    return (
+        <div className="flex flex-col h-[calc(100vh-8rem)] max-h-[850px] space-y-4">
+            <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+                    <Sparkles className="h-8 w-8 text-indigo-500"/>
+                    {t('ai.title', 'Hardware Consultant')}
+                </h1>
+                <Button variant="outline" onClick={handleClear}>Clear Chat</Button>
+            </div>
+
+            <Card className="flex flex-col flex-1 overflow-hidden border shadow-sm">
+                <CardContent className="flex-1 overflow-y-auto p-4 space-y-6">
+                    {messages.map((msg, idx) => (
+                        <div key={idx}
+                             className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role === 'assistant' && (
+                                <div
+                                    className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <Bot className="h-5 w-5 text-indigo-600"/>
+                                </div>
+                            )}
+
+                            <div className={`max-w-[85%] rounded-2xl px-5 py-4 shadow-sm ${
+                                msg.role === 'user'
+                                    ? 'bg-indigo-600 text-white rounded-tr-sm'
+                                    : 'bg-white border border-gray-100 text-gray-800 rounded-tl-sm'
+                            }`}>
+                                {msg.role === 'user' ? (
+                                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                ) : (
+                                    <div
+                                        className="prose prose-sm sm:prose-base max-w-none dark:prose-invert prose-p:leading-relaxed prose-pre:bg-gray-800 prose-pre:text-gray-100">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {msg.content}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
+                            </div>
+
+                            {msg.role === 'user' && (
+                                <div
+                                    className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0 mt-1">
+                                    <User className="h-5 w-5 text-gray-600"/>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {loading && (
+                        <div className="flex gap-3 justify-start">
+                            <div
+                                className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center flex-shrink-0 mt-1">
+                                <Bot className="h-5 w-5 text-indigo-600"/>
+                            </div>
+                            <div
+                                className="bg-white border border-gray-100 shadow-sm rounded-2xl rounded-tl-sm px-5 py-4 flex items-center">
+                                <Loader2 className="h-5 w-5 animate-spin text-gray-400"/>
+                                <span className="ml-3 text-sm font-medium text-gray-500">Consultant is typing...</span>
+                            </div>
+                        </div>
+                    )}
+                    <div ref={messagesEndRef} className="h-1"/>
+                </CardContent>
+
+                <div className="p-4 border-t bg-gray-50">
+                    <div className="flex gap-2">
+                        <Input
+                            value={input}
+                            onChange={e => setInput(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            placeholder="Tell me what you'd like to build..."
+                            disabled={loading}
+                            className="flex-1 bg-white"
+                        />
+                        <Button onClick={handleSend} disabled={!input.trim() || loading} className="gap-2 px-6">
+                            <Send className="h-4 w-4"/>
+                            Send
+                        </Button>
+                    </div>
+                </div>
+            </Card>
         </div>
-
-        {/* Right Results Panel */}
-        <div className="col-span-1 lg:col-span-8 space-y-6">
-          {suggestions && suggestions.length > 0 ? (
-            suggestions.map((suggestion, index) => (
-             <Card key={index} className="border-primary/50 shadow-md shadow-primary/10">
-               <CardHeader className="border-b border-border bg-muted/20">
-                 <div className="flex items-start justify-between">
-                   <div>
-                     <CardTitle className="text-2xl text-primary">{suggestion.title || t('ai.defaultTitle')}</CardTitle>
-                     <p className="text-sm text-muted-foreground mt-2">{suggestion.description}</p>
-                   </div>
-                   <div className="flex flex-col items-end space-y-1 shrink-0 ml-4">
-                     <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-500">
-                       {suggestion.difficulty || t('ai.defaultDiff')}
-                     </span>
-                     <span className="text-xs text-muted-foreground font-mono whitespace-nowrap">
-                       {suggestion.estimated_build_time_hours ? `${suggestion.estimated_build_time_hours} hours` : t('ai.defaultTime')}
-                     </span>
-                   </div>
-                 </div>
-               </CardHeader>
-               <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div>
-                   <h3 className="text-lg font-semibold mb-4">{t('ai.requiredPieces')}</h3>
-                   <ul className="space-y-3">
-                     {suggestion.components_breakdown?.map((piece, idx) => (
-                       <li key={idx} className="flex items-start space-x-3">
-                         {piece.status === 'Available' || piece.status === 'Mevcut' ? (
-                           <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                         ) : (
-                           <Circle className="h-5 w-5 text-orange-500 shrink-0" />
-                         )}
-                         <div className="flex-1 flex justify-between items-center border-b border-border/50 pb-1">
-                           <span className="text-sm font-medium">{piece.name}</span>
-                           <span className={`text-xs ${piece.status === 'Available' || piece.status === 'Mevcut' ? 'text-green-500' : 'text-orange-500'}`}>
-                             {piece.status}
-                           </span>
-                         </div>
-                       </li>
-                     ))}
-                   </ul>
-                 </div>
-                 
-                 <div>
-                   <h3 className="text-lg font-semibold mb-4">{t('ai.steps')}</h3>
-                   <ol className="space-y-4">
-                     {suggestion.step_by_step_summary?.map((step, idx) => (
-                       <li key={idx} className="flex space-x-3">
-                         <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                           {idx + 1}
-                         </span>
-                         <span className="text-sm text-muted-foreground leading-relaxed">
-                           {step}
-                         </span>
-                       </li>
-                     ))}
-                   </ol>
-                 </div>
-               </CardContent>
-               
-               <div className="p-6 pt-0 border-t border-border/50 mt-4">
-                 {!detailsMap[index] ? (
-                   <Button 
-                     onClick={() => handleGetDetails(index, suggestion)} 
-                     disabled={detailLoadingMap[index]}
-                     variant="outline"
-                     className="w-full mt-4"
-                   >
-                     {detailLoadingMap[index] ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                     {t('ai.getDetails', 'Detaylandır / Get Details')}
-                   </Button>
-                 ) : (
-                   <div className="space-y-6 mt-6 animate-in fade-in slide-in-from-bottom-4">
-                     <div>
-                       <h3 className="text-lg font-semibold mb-2">{t('ai.wiring', 'Devre Şeması (Wiring Guide)')}</h3>
-                       <div className="bg-muted p-4 rounded-md border border-border overflow-x-auto">
-                         <pre className="text-sm font-mono whitespace-pre-wrap">{detailsMap[index].wiring_guide}</pre>
-                       </div>
-                     </div>
-                     <div>
-                       <h3 className="text-lg font-semibold mb-2">{t('ai.code', 'Örnek Kod (Code Sketch)')}</h3>
-                       <div className="bg-zinc-950 p-4 rounded-md border border-zinc-800 overflow-x-auto">
-                         <pre className="text-sm font-mono text-emerald-400 whitespace-pre-wrap">{detailsMap[index].code_sketch}</pre>
-                       </div>
-                     </div>
-                   </div>
-                 )}
-               </div>
-             </Card>
-            ))
-          ) : (
-             <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-muted-foreground border-2 border-dashed border-border rounded-xl">
-               <Sparkles className="h-12 w-12 text-muted-foreground/30 mb-4" />
-               <p>{t('ai.empty')}</p>
-             </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
