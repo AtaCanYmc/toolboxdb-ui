@@ -7,7 +7,7 @@ ToolboxDB UI is a highly modern, professional, and responsive Single Page Applic
 - **Dashboard Overview**: High-level metrics showing total unique components, active categories, and a recent activity feed with color-coded low-stock warnings.
 - **AI-Powered Invoice Processing**: Drag-and-drop file upload zone for PDF invoices. Features a side-by-side split view simulating PDF metadata while providing an editable dynamic form table populated by AI-extracted components.
 - **Inventory & Component Management**: A clean, responsive data table presenting current stock levels, categories, and creation dates fetched directly from the backend.
-- **AI Project Suggestion Hub**: A dedicated creative zone where users can provide available components, difficulty level, and custom prompts to generate step-by-step project recipe cards (including missing vs. available parts breakdown).
+- **Hardware Consultant Agent (Chat)**: A modern, markdown-supported conversational interface powered by LangGraph. Instead of a static form, users chat with an AI assistant that dynamically searches your active inventory, fetches live market prices from electronics stores, optimizes shipping carts, and provides step-by-step project code snippets. Includes a stateless memory approach utilizing `sessionStorage`.
 
 ## 🛠️ Tech Stack
 
